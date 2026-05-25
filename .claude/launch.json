@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "app-receitas-biblicas",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--open", "false"],
+      "port": 8080
+    }
+  ]
+}

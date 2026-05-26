@@ -111,6 +111,10 @@ function LandingLogin() {
 
   return (
     <div className="relative mx-auto min-h-screen w-full max-w-md overflow-hidden bg-background">
+      {/* TESTE DE DEPLOY — remover depois */}
+      <div className="bg-red-500 text-white text-center py-3 px-4 font-bold text-lg">
+        🚀 TESTE DE DEPLOY AUTOMÁTICO 🚀
+      </div>
       {/* Prominent language picker — pinned to the top of the screen */}
       <div className="sticky top-0 z-20 flex items-center justify-center gap-2 bg-cream/95 backdrop-blur px-4 py-2.5 border-b border-border/40">
         <button

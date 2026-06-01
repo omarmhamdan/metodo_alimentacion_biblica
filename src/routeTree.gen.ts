@@ -11,9 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SucoSagradoRouteImport } from './routes/suco-sagrado'
 import { Route as ReceitasRouteImport } from './routes/receitas'
+import { Route as ProtocoloRouteImport } from './routes/protocolo'
 import { Route as ProgressoRouteImport } from './routes/progresso'
 import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as MesaUnicaRouteImport } from './routes/mesa-unica'
 import { Route as FundamentosRouteImport } from './routes/fundamentos'
 import { Route as DevocionalRouteImport } from './routes/devocional'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -32,6 +34,11 @@ const ReceitasRoute = ReceitasRouteImport.update({
   path: '/receitas',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProtocoloRoute = ProtocoloRouteImport.update({
+  id: '/protocolo',
+  path: '/protocolo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProgressoRoute = ProgressoRouteImport.update({
   id: '/progresso',
   path: '/progresso',
@@ -45,6 +52,11 @@ const PerfilRoute = PerfilRouteImport.update({
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MesaUnicaRoute = MesaUnicaRouteImport.update({
+  id: '/mesa-unica',
+  path: '/mesa-unica',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FundamentosRoute = FundamentosRouteImport.update({
@@ -89,9 +101,11 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/devocional': typeof DevocionalRoute
   '/fundamentos': typeof FundamentosRoute
+  '/mesa-unica': typeof MesaUnicaRoute
   '/onboarding': typeof OnboardingRoute
   '/perfil': typeof PerfilRoute
   '/progresso': typeof ProgressoRoute
+  '/protocolo': typeof ProtocoloRoute
   '/receitas': typeof ReceitasRouteWithChildren
   '/suco-sagrado': typeof SucoSagradoRoute
   '/receitas/$id': typeof ReceitasIdRoute
@@ -103,9 +117,11 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/devocional': typeof DevocionalRoute
   '/fundamentos': typeof FundamentosRoute
+  '/mesa-unica': typeof MesaUnicaRoute
   '/onboarding': typeof OnboardingRoute
   '/perfil': typeof PerfilRoute
   '/progresso': typeof ProgressoRoute
+  '/protocolo': typeof ProtocoloRoute
   '/suco-sagrado': typeof SucoSagradoRoute
   '/receitas/$id': typeof ReceitasIdRoute
   '/receitas': typeof ReceitasIndexRoute
@@ -117,9 +133,11 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/devocional': typeof DevocionalRoute
   '/fundamentos': typeof FundamentosRoute
+  '/mesa-unica': typeof MesaUnicaRoute
   '/onboarding': typeof OnboardingRoute
   '/perfil': typeof PerfilRoute
   '/progresso': typeof ProgressoRoute
+  '/protocolo': typeof ProtocoloRoute
   '/receitas': typeof ReceitasRouteWithChildren
   '/suco-sagrado': typeof SucoSagradoRoute
   '/receitas/$id': typeof ReceitasIdRoute
@@ -133,9 +151,11 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/devocional'
     | '/fundamentos'
+    | '/mesa-unica'
     | '/onboarding'
     | '/perfil'
     | '/progresso'
+    | '/protocolo'
     | '/receitas'
     | '/suco-sagrado'
     | '/receitas/$id'
@@ -147,9 +167,11 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/devocional'
     | '/fundamentos'
+    | '/mesa-unica'
     | '/onboarding'
     | '/perfil'
     | '/progresso'
+    | '/protocolo'
     | '/suco-sagrado'
     | '/receitas/$id'
     | '/receitas'
@@ -160,9 +182,11 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/devocional'
     | '/fundamentos'
+    | '/mesa-unica'
     | '/onboarding'
     | '/perfil'
     | '/progresso'
+    | '/protocolo'
     | '/receitas'
     | '/suco-sagrado'
     | '/receitas/$id'
@@ -175,9 +199,11 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   DevocionalRoute: typeof DevocionalRoute
   FundamentosRoute: typeof FundamentosRoute
+  MesaUnicaRoute: typeof MesaUnicaRoute
   OnboardingRoute: typeof OnboardingRoute
   PerfilRoute: typeof PerfilRoute
   ProgressoRoute: typeof ProgressoRoute
+  ProtocoloRoute: typeof ProtocoloRoute
   ReceitasRoute: typeof ReceitasRouteWithChildren
   SucoSagradoRoute: typeof SucoSagradoRoute
 }
@@ -196,6 +222,13 @@ declare module '@tanstack/react-router' {
       path: '/receitas'
       fullPath: '/receitas'
       preLoaderRoute: typeof ReceitasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/protocolo': {
+      id: '/protocolo'
+      path: '/protocolo'
+      fullPath: '/protocolo'
+      preLoaderRoute: typeof ProtocoloRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/progresso': {
@@ -217,6 +250,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mesa-unica': {
+      id: '/mesa-unica'
+      path: '/mesa-unica'
+      fullPath: '/mesa-unica'
+      preLoaderRoute: typeof MesaUnicaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fundamentos': {
@@ -291,9 +331,11 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   DevocionalRoute: DevocionalRoute,
   FundamentosRoute: FundamentosRoute,
+  MesaUnicaRoute: MesaUnicaRoute,
   OnboardingRoute: OnboardingRoute,
   PerfilRoute: PerfilRoute,
   ProgressoRoute: ProgressoRoute,
+  ProtocoloRoute: ProtocoloRoute,
   ReceitasRoute: ReceitasRouteWithChildren,
   SucoSagradoRoute: SucoSagradoRoute,
 }

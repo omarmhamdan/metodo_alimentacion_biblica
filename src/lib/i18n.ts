@@ -26,6 +26,8 @@ export const T = {
     nav_mesa: "Edén",
     nav_devocion: "Devoción",
     nav_perfil: "Perfil",
+    nav_protocolo: "Antiinflamación",
+    nav_mesa_unica: "Mesa Única",
 
     // Login
     login_badge: "Método Bíblico",
@@ -168,6 +170,8 @@ export const T = {
     nav_mesa: "Mesa",
     nav_devocion: "Devoção",
     nav_perfil: "Perfil",
+    nav_protocolo: "Anti-Inflamação",
+    nav_mesa_unica: "Mesa Única",
 
     login_badge: "Método Bíblico",
     login_pwa_banner_title: "Bem-vindo! App instalado com sucesso",

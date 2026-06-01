@@ -20,6 +20,7 @@ import {
   Droplets,
   BookOpen,
   AlertCircle,
+  Sparkles,
 } from "lucide-react";
 import {
   adminLogin,
@@ -51,13 +52,14 @@ import {
 import { useUser } from "@/lib/store";
 import { recipes } from "@/lib/recipes";
 import { recipeTranslationsES } from "@/lib/recipes-es";
+import { bonusSlots } from "@/lib/bonus-images";
 
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
   // title set by AppShell bootstrap (per-language)
 });
 
-type Tab = "dashboard" | "receitas" | "conteudo" | "usuarios" | "exportar";
+type Tab = "dashboard" | "receitas" | "bonus" | "conteudo" | "usuarios" | "exportar";
 
 function AdminPage() {
   const navigate = useNavigate();
@@ -281,6 +283,7 @@ function AdminPage() {
   const tabs: { id: Tab; label: string; icon: typeof ChefHat }[] = [
     { id: "dashboard", label: "Dashboard", icon: BarChart3 },
     { id: "receitas", label: "Receitas", icon: ChefHat },
+    { id: "bonus", label: "Bônus", icon: Sparkles },
     { id: "conteudo", label: "Conteúdo", icon: FileText },
     { id: "usuarios", label: "Usuários", icon: Users },
     { id: "exportar", label: "Exportar", icon: Download },
@@ -536,6 +539,59 @@ function AdminPage() {
                 );
               })}
             </div>
+          </div>
+        )}
+
+        {/* ── BÔNUS (imagens dos guias Anti-Inflamação + Mesa Única) ── */}
+        {tab === "bonus" && (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-xl font-semibold">Imagens dos Bônus</h2>
+              <p className="mt-1 text-sm text-stone-400">
+                Fotos das páginas Anti-Inflamação 7 Dias e Guia Mesa Única. Upe a foto e ela é
+                publicada para todos automaticamente (via Supabase).
+              </p>
+            </div>
+
+            {!supabaseEnabled && (
+              <div className="flex items-start gap-3 rounded-2xl border border-amber-500/20 bg-amber-500/10 p-4">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
+                <p className="text-xs text-amber-400/90">
+                  Supabase não configurado neste ambiente — uploads ficam só neste dispositivo. Em
+                  produção (com Supabase), as fotos sobem para todos.
+                </p>
+              </div>
+            )}
+
+            {Array.from(new Set(bonusSlots.map((s) => s.group))).map((group) => (
+              <div key={group} className="space-y-3">
+                <h3 className="text-sm font-semibold text-stone-200">{group}</h3>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {bonusSlots
+                    .filter((s) => s.group === group)
+                    .map((slot) => (
+                      <BonusImageCard
+                        key={slot.id}
+                        slot={slot}
+                        currentImg={adminImages[slot.id] || slot.fallback}
+                        hasCustom={Boolean(adminImages[slot.id])}
+                        imgKb={imgSizes[slot.id]}
+                        onUpload={(file) => handlePhotoUpload(slot.id, file)}
+                        onRestore={() => {
+                          deleteImage(slot.id).then(() =>
+                            setAdminImages((prev) => {
+                              const n = { ...prev };
+                              delete n[slot.id];
+                              return n;
+                            }),
+                          );
+                          deleteRecipePhoto(slot.id).catch(() => {});
+                        }}
+                      />
+                    ))}
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
@@ -1018,6 +1074,94 @@ function RecipeCard({
               className="w-full rounded-xl border border-stone-600 bg-stone-800 px-3 py-2 text-xs text-white outline-none focus:border-olive/50"
             />
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BonusImageCard({
+  slot,
+  currentImg,
+  hasCustom,
+  imgKb,
+  onUpload,
+  onRestore,
+}: {
+  slot: { id: string; label: string };
+  currentImg: string;
+  hasCustom: boolean;
+  imgKb?: number;
+  onUpload: (f: File) => void;
+  onRestore: () => void;
+}) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [err, setErr] = useState(false);
+  return (
+    <div className="flex gap-3 rounded-2xl border border-stone-700 bg-stone-900 p-3">
+      <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-stone-800">
+        {!err ? (
+          <img
+            src={currentImg}
+            alt={slot.label}
+            className="h-full w-full object-cover"
+            onError={() => setErr(true)}
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center p-1 text-center text-[10px] text-stone-600">
+            Sem foto
+          </div>
+        )}
+      </div>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex items-center gap-2">
+          <span className="truncate text-sm font-medium text-white">{slot.label}</span>
+          {hasCustom && (
+            <span className="shrink-0 rounded-full bg-olive/20 px-2 py-0.5 text-[10px] text-olive">
+              custom
+            </span>
+          )}
+        </div>
+        <span className="mb-2 text-[10px] text-stone-500">{slot.id}</span>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onClick={(e) => {
+            (e.target as HTMLInputElement).value = "";
+          }}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) {
+              setErr(false);
+              onUpload(file);
+            }
+          }}
+        />
+        <div className="mt-auto flex items-center gap-2">
+          <button
+            onClick={() => fileRef.current?.click()}
+            className="flex items-center justify-center gap-1 rounded-lg border border-olive/30 bg-olive/20 px-2.5 py-1.5 text-[10px] text-olive hover:bg-olive/30"
+          >
+            <Image className="h-3 w-3" /> Upar foto
+          </button>
+          {hasCustom && (
+            <button
+              onClick={() => {
+                onRestore();
+                setErr(false);
+              }}
+              className="flex items-center justify-center gap-1 rounded-lg border border-red-500/30 bg-red-500/10 px-2.5 py-1.5 text-[10px] text-red-400 hover:bg-red-500/20"
+            >
+              <Trash2 className="h-3 w-3" /> Restaurar
+            </button>
+          )}
+          {imgKb != null && (
+            <span className={`text-[10px] ${imgKb > 800 ? "text-amber-400" : "text-green-400"}`}>
+              ✓ {imgKb}KB
+            </span>
+          )}
         </div>
       </div>
     </div>

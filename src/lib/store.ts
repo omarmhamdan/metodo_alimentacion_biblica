@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { getLang, setLang as setLangStorage, type Lang, T } from "./i18n";
 import { getRecipesLang, type Receita } from "./recipes";
-import { initImages, isImagesReady } from "./image-store";
+import { initImages, isImagesReady, getCachedImages } from "./image-store";
 import { upsertProfile, upsertDaily } from "./sync";
 
 export interface UserProfile {
@@ -200,6 +200,32 @@ export function useLang() {
   const t = (key: keyof typeof T.es): string => T[lang][key] as string;
 
   return { lang, setLang, t };
+}
+
+/** Resolve a set of image ids → URL, falling back to bundled stock assets.
+ *  Reactive to admin uploads (cloud/IDB) via the `mab:images` events.
+ *  Pass a STABLE (module-level) fallbacks object to keep the effect stable. */
+export function useStoredImageMap(fallbacks: Record<string, string>): Record<string, string> {
+  const resolve = () => {
+    const cache = getCachedImages();
+    const out: Record<string, string> = {};
+    for (const id in fallbacks) out[id] = cache[id] ?? fallbacks[id];
+    return out;
+  };
+  const [imgs, setImgs] = useState<Record<string, string>>(resolve);
+  useEffect(() => {
+    const fn = () => setImgs(resolve());
+    fn();
+    window.addEventListener("mab:images", fn);
+    window.addEventListener("mab:images-ready", fn);
+    initImages();
+    return () => {
+      window.removeEventListener("mab:images", fn);
+      window.removeEventListener("mab:images-ready", fn);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fallbacks]);
+  return imgs;
 }
 
 /** True once the IndexedDB image cache is populated. Components can use this

@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { Home, BookOpen, ChefHat, HeartHandshake, User, Sparkles, Utensils } from "lucide-react";
+import { Home, ChefHat, HeartHandshake, User, Sparkles, Utensils } from "lucide-react";
 import { useLang } from "@/lib/store";
 
 export function BottomNav() {
@@ -11,7 +11,6 @@ export function BottomNav() {
     { to: "/receitas", label: t("nav_recetas"), icon: ChefHat },
     { to: "/protocolo", label: t("nav_protocolo"), icon: Sparkles },
     { to: "/mesa-unica", label: t("nav_mesa_unica"), icon: Utensils },
-    { to: "/fundamentos", label: t("nav_mesa"), icon: BookOpen },
     { to: "/devocional", label: t("nav_devocion"), icon: HeartHandshake },
     { to: "/perfil", label: t("nav_perfil"), icon: User },
   ] as const;
@@ -38,7 +37,7 @@ export function BottomNav() {
                   <Icon className="h-[18px] w-[18px]" strokeWidth={1.75} />
                 </span>
                 <span
-                  className={`text-center ${small ? "line-clamp-2 leading-[1.1]" : "whitespace-nowrap"} ${active ? "text-foreground font-medium" : "text-muted-foreground"}`}
+                  className={`text-center ${small ? "whitespace-pre-line leading-[1.1]" : "whitespace-nowrap"} ${active ? "text-foreground font-medium" : "text-muted-foreground"}`}
                 >
                   {label}
                 </span>

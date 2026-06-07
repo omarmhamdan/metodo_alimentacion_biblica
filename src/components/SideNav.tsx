@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { Home, BookOpen, ChefHat, HeartHandshake, User, Sparkles, Utensils } from "lucide-react";
+import { Home, ChefHat, HeartHandshake, User, Sparkles, Utensils } from "lucide-react";
 import { useLang } from "@/lib/store";
 import { BrandIcon } from "./BrandIcon";
 
@@ -13,7 +13,6 @@ export function SideNav() {
     { to: "/receitas", label: t("nav_recetas"), icon: ChefHat },
     { to: "/protocolo", label: t("nav_protocolo"), icon: Sparkles },
     { to: "/mesa-unica", label: t("nav_mesa_unica"), icon: Utensils },
-    { to: "/fundamentos", label: t("nav_mesa"), icon: BookOpen },
     { to: "/devocional", label: t("nav_devocion"), icon: HeartHandshake },
     { to: "/perfil", label: t("nav_perfil"), icon: User },
   ] as const;
@@ -51,7 +50,7 @@ export function SideNav() {
               }`}
             >
               <Icon className="h-5 w-5 shrink-0" strokeWidth={1.75} />
-              <span>{label}</span>
+              <span>{label.replace(/\n/g, "")}</span>
             </Link>
           );
         })}

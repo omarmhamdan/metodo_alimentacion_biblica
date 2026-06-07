@@ -26,7 +26,7 @@ export const T = {
     nav_mesa: "Edén",
     nav_devocion: "Devoción",
     nav_perfil: "Perfil",
-    nav_protocolo: "Antiinflamación",
+    nav_protocolo: "Anti\ninflamación",
     nav_mesa_unica: "Mesa Única",
 
     // Login
@@ -170,7 +170,7 @@ export const T = {
     nav_mesa: "Mesa",
     nav_devocion: "Devoção",
     nav_perfil: "Perfil",
-    nav_protocolo: "Anti-Inflamação",
+    nav_protocolo: "Anti-\nInflamação",
     nav_mesa_unica: "Mesa Única",
 
     login_badge: "Método Bíblico",

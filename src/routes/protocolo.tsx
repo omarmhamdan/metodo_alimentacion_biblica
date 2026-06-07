@@ -17,6 +17,8 @@ import {
   BookHeart,
   Clock,
   ChefHat,
+  Apple,
+  FlaskConical,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useLang, useStoredImageMap } from "@/lib/store";
@@ -199,6 +201,9 @@ function Landing({
           <GuideCard icon={CircleAlert} title={c.secErros}>
             <Erros c={c} />
           </GuideCard>
+          <GuideCard icon={FlaskConical} title={c.secMitos}>
+            <Mitos c={c} />
+          </GuideCard>
           <GuideCard icon={HelpCircle} title={c.secFaq}>
             <Faq c={c} />
           </GuideCard>
@@ -317,6 +322,49 @@ function DayDetail({
             />
           </div>
         </div>
+
+        {/* Ciência do dia */}
+        {dia.ciencia && (
+          <div className="mt-3 rounded-2xl bg-gradient-devotional p-4">
+            <div className="mb-1 flex items-center gap-2">
+              <FlaskConical className="h-4 w-4 text-earth" />
+              <p className="text-[11px] font-medium uppercase tracking-wider text-earth">
+                {c.lblCiencia}
+              </p>
+            </div>
+            <Ed
+              as="p"
+              k={`protocolo.dia.${dia.numero}.ciencia`}
+              pt={PT.dias[dia.numero - 1].ciencia ?? ""}
+              es={ES.dias[dia.numero - 1].ciencia ?? ""}
+              className="block text-sm leading-relaxed text-foreground"
+            />
+          </div>
+        )}
+
+        {/* Lanches liberados */}
+        {dia.snacks && dia.snacks.length > 0 && (
+          <div className="mt-3 rounded-2xl bg-card p-4 shadow-card">
+            <div className="mb-2 flex items-center gap-2">
+              <Apple className="h-4 w-4 text-olive" />
+              <p className="text-[11px] font-medium uppercase tracking-wider text-foreground">
+                {c.lblSnacks}
+              </p>
+            </div>
+            <ul className="space-y-1.5">
+              {dia.snacks.map((s, j) => (
+                <li key={j} className="flex items-start gap-2 text-[13px] text-muted-foreground">
+                  <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-olive" />
+                  <Ed
+                    k={`protocolo.dia.${dia.numero}.snack.${j}`}
+                    pt={PT.dias[dia.numero - 1].snacks?.[j] ?? s}
+                    es={ES.dias[dia.numero - 1].snacks?.[j] ?? s}
+                  />
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {/* Navegação entre dias */}
         <div className="mt-5 flex items-center justify-between gap-3">
@@ -678,6 +726,16 @@ function Erros({ c }: { c: ProtocoloContent }) {
     <div className="space-y-2">
       {c.erros.map((e, i) => (
         <FoodItem key={i} item={e} k={`protocolo.erro.${i}`} pt={PT.erros[i]} es={ES.erros[i]} />
+      ))}
+    </div>
+  );
+}
+
+function Mitos({ c }: { c: ProtocoloContent }) {
+  return (
+    <div className="space-y-2">
+      {c.mitos.map((m, i) => (
+        <FoodItem key={i} item={m} k={`protocolo.mito.${i}`} pt={PT.mitos[i]} es={ES.mitos[i]} />
       ))}
     </div>
   );

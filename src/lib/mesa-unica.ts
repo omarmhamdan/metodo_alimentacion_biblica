@@ -8,6 +8,14 @@ export interface ParTexto {
   texto: string;
 }
 
+export interface ReceitaMesa {
+  titulo: string;
+  tempo: string;
+  rende: string;
+  ingredientes: string[];
+  preparo: string[];
+}
+
 export interface Categoria {
   id: string;
   titulo: string;
@@ -15,6 +23,8 @@ export interface Categoria {
   suaVersao: string;
   versaoFamilia: ParTexto[];
   tecnica: string;
+  porque: string;
+  receitas: ReceitaMesa[];
 }
 
 export interface MotivoCrianca {
@@ -30,6 +40,8 @@ export interface Swap {
 export interface PratoDomingo {
   titulo: string;
   texto: string;
+  ingredientes: string[];
+  preparo: string[];
 }
 
 export interface Fase {
@@ -66,6 +78,10 @@ export interface MesaContent {
   lblSuaVersao: string;
   lblVersaoFamilia: string;
   lblTecnica: string;
+  lblPorque: string;
+  lblReceitas: string;
+  lblIngredientes: string;
+  lblPreparo: string;
   categorias: Categoria[];
 
   // Parte 2 — engana o paladar
@@ -180,6 +196,10 @@ const pt: MesaContent = {
   lblSuaVersao: "A sua versão",
   lblVersaoFamilia: "A versão da família",
   lblTecnica: "A técnica-chave",
+  lblPorque: "Por que funciona (a ciência)",
+  lblReceitas: "Receitas completas",
+  lblIngredientes: "Ingredientes",
+  lblPreparo: "Modo de preparo",
   categorias: [
     {
       id: "lentilhas",
@@ -206,6 +226,56 @@ const pt: MesaContent = {
       ],
       tecnica:
         "Sempre doure a cebola lentamente antes. A base de cebola caramelizada disfarça completamente o \"gosto de grão\" que algumas pessoas rejeitam.",
+      porque:
+        "Lentilha e grão-de-bico são proteína vegetal completa quando combinados com um cereal (arroz, pão) — formam todos os aminoácidos que o corpo precisa, sem a gordura inflamatória da carne processada. São ricos em fibra solúvel, que alimenta as bactérias boas do intestino e mantém o açúcar do sangue estável (sem o pico-e-queda que dá fome e irritação nas crianças). O ferro vegetal deles é melhor absorvido junto com vitamina C — por isso um aperto de limão no final não é só sabor, é nutrição. Na Bíblia, foi com um prato de lentilhas que Jacó alimentou Esaú (Gênesis 25): comida simples, barata e farta, que sustenta a casa inteira.",
+      receitas: [
+        {
+          titulo: "Almôndegas douradas de lentilha (assadas)",
+          tempo: "35 minutos",
+          rende: "4 porções (≈ 20 almôndegas)",
+          ingredientes: [
+            "2 xícaras de lentilha cozida e bem escorrida",
+            "1 cebola média ralada e refogada até dourar",
+            "2 dentes de alho amassados",
+            "1 ovo",
+            "4 colheres de sopa de farinha de aveia (ou farinha de rosca integral)",
+            "2 colheres de sopa de salsa picada",
+            "1 colher de chá de cominho",
+            "1 colher de chá de páprica doce",
+            "Sal, pimenta e azeite",
+          ],
+          preparo: [
+            "Preaqueça o forno a 200°C e forre uma assadeira com papel-manteiga.",
+            "Amasse a lentilha com um garfo até virar uma pasta grossa (deixe alguns pedaços para textura).",
+            "Misture a cebola dourada, o alho, o ovo, a farinha, a salsa e os temperos. A massa deve ficar moldável — se estiver mole, junte mais 1 colher de farinha.",
+            "Modele bolinhas do tamanho de uma noz, disponha na assadeira e pincele com azeite.",
+            "Asse por 25 minutos, virando na metade, até dourarem por fora.",
+            "Sirva com molho de tomate caseiro por cima do macarrão, ou no pão como \"almôndega\".",
+          ],
+        },
+        {
+          titulo: "Hambúrguer de grão-de-bico e cenoura",
+          tempo: "30 minutos",
+          rende: "6 hambúrgueres",
+          ingredientes: [
+            "2 xícaras de grão-de-bico cozido",
+            "1 cenoura média ralada fina",
+            "Meia cebola ralada",
+            "1 ovo",
+            "5 colheres de sopa de aveia em flocos",
+            "1 colher de chá de cominho",
+            "1 colher de chá de cúrcuma",
+            "Coentro ou salsa a gosto, sal e azeite",
+          ],
+          preparo: [
+            "Processe o grão-de-bico com o ovo até virar uma pasta grossa.",
+            "Misture a cenoura, a cebola, a aveia e os temperos. Deixe descansar 10 minutos (a aveia absorve a umidade e dá liga).",
+            "Modele discos de 1,5 cm de altura.",
+            "Doure em frigideira com um fio de azeite, 4 minutos de cada lado, OU asse a 200°C por 20 minutos.",
+            "Monte no pão de fermentação natural com folhas, tomate e um molho de iogurte com limão.",
+          ],
+        },
+      ],
     },
     {
       id: "peixes",
@@ -232,6 +302,48 @@ const pt: MesaContent = {
       ],
       tecnica:
         "Limão e ervas frescas (endro e salsa) eliminam o cheiro forte. Tempere com antecedência e nunca cozinhe demais — peixe ressecado é o que cria a má fama.",
+      porque:
+        "O peixe é a proteína mais anti-inflamatória da mesa por causa do ômega-3 (EPA e DHA), que o corpo usa para 'apagar' a inflamação celular — o oposto químico dos óleos de soja e milho dos ultraprocessados. O DHA é literalmente matéria-prima do cérebro da criança em formação, por isso peixe 2 a 3 vezes por semana é um dos melhores hábitos que uma família pode ter. O 'cheiro de peixe' que afasta as pessoas vem da oxidação quando o peixe é velho ou cozido demais — peixe fresco, temperado com limão e assado no ponto, não tem esse cheiro. O peixe é símbolo profundo nas Escrituras: da pesca dos discípulos à multiplicação que alimentou a multidão.",
+      receitas: [
+        {
+          titulo: "Peixe empanado no forno (sem fritura)",
+          tempo: "25 minutos",
+          rende: "4 porções",
+          ingredientes: [
+            "4 filés de peixe branco (tilápia, merluza ou pescada)",
+            "1 ovo batido",
+            "1 xícara de farinha de rosca integral",
+            "4 colheres de sopa de queijo parmesão ralado",
+            "1 colher de chá de orégano",
+            "Raspas de meio limão",
+            "Suco de meio limão, sal, pimenta e azeite",
+          ],
+          preparo: [
+            "Preaqueça o forno a 220°C. Tempere os filés com limão, sal e pimenta.",
+            "Misture a farinha de rosca, o parmesão, o orégano e as raspas de limão num prato.",
+            "Passe cada filé no ovo e depois na mistura crocante, pressionando bem.",
+            "Disponha numa assadeira com papel-manteiga, regue com um fio de azeite por cima.",
+            "Asse por 15 a 18 minutos, até a casquinha dourar. Vira 'peixe empanado' que criança come com a mão.",
+          ],
+        },
+        {
+          titulo: "Iscas de peixe com molho de iogurte",
+          tempo: "20 minutos",
+          rende: "4 porções (petisco)",
+          ingredientes: [
+            "500 g de filé de peixe cortado em tiras",
+            "1 ovo + meia xícara de farinha de rosca integral com ervas",
+            "Para o molho: 1 pote de iogurte natural, suco de meio limão, 1 colher de sopa de salsa picada, sal",
+            "Azeite, sal e pimenta",
+          ],
+          preparo: [
+            "Tempere as tiras com sal, pimenta e um pouco de limão.",
+            "Empane no ovo e na farinha de rosca e asse a 220°C por 12 a 15 minutos (ou doure rapidamente na frigideira com azeite).",
+            "Misture os ingredientes do molho de iogurte.",
+            "Sirva as iscas com o molho para mergulhar — vira petisco da casa, não 'janta de peixe'.",
+          ],
+        },
+      ],
     },
     {
       id: "legumes",
@@ -263,6 +375,51 @@ const pt: MesaContent = {
       ],
       tecnica:
         "Dourar é tudo. O legume assado até dourar desenvolve açúcar natural (caramelização) que transforma o sabor. Cozido na água perde cor, sabor e textura.",
+      porque:
+        "Os legumes coloridos carregam os fitoquímicos que combatem a inflamação — o vermelho do tomate (licopeno), o laranja da cenoura e abóbora (betacaroteno), o verde-escuro da couve (luteína e magnésio). Quanto mais cores no prato, mais amplo o escudo antioxidante. A fibra deles é o 'alimento' das bactérias boas do intestino, e um intestino equilibrado significa menos inflamação no corpo inteiro e até melhor humor. O segredo é a forma de preparar: ferver na água joga os nutrientes e a cor fora; assar ou saltear até dourar preserva tudo e cria o açúcar natural (caramelização) que faz até quem 'não come legume' devorar. Comer o que a terra dá em variedade é voltar à mesa do Éden — 'toda erva que dá semente' (Gênesis 1:29).",
+      receitas: [
+        {
+          titulo: "Palitos crocantes de legumes assados",
+          tempo: "30 minutos",
+          rende: "4 porções",
+          ingredientes: [
+            "2 cenouras em palitos",
+            "1 abobrinha em palitos",
+            "Meia abóbora cabotiá em palitos",
+            "2 colheres de sopa de azeite",
+            "1 colher de chá de páprica doce",
+            "Meia colher de chá de alho em pó",
+            "Sal e orégano",
+          ],
+          preparo: [
+            "Preaqueça o forno a 220°C.",
+            "Misture todos os palitos com o azeite e os temperos numa tigela, até cobrir bem.",
+            "Espalhe em uma assadeira em camada única (sem amontoar — senão cozinham no vapor em vez de dourar).",
+            "Asse por 22 a 25 minutos, virando na metade, até as pontas ficarem douradas e crocantes.",
+            "Sirva como 'batata da casa', com um molho de iogurte ou homus para mergulhar.",
+          ],
+        },
+        {
+          titulo: "Molho de tomate com legumes escondidos",
+          tempo: "30 minutos",
+          rende: "molho para 4-6 porções de macarrão",
+          ingredientes: [
+            "6 tomates maduros (ou 1 lata de tomate pelado)",
+            "1 cenoura ralada fina",
+            "1 abobrinha ralada fina",
+            "1 cebola e 3 dentes de alho",
+            "1 pitada de mel (equilibra a acidez)",
+            "Manjericão fresco, azeite e sal",
+          ],
+          preparo: [
+            "Doure a cebola e o alho no azeite, sem pressa.",
+            "Junte a cenoura e a abobrinha raladas e refogue por 5 minutos — elas vão sumindo na textura.",
+            "Acrescente os tomates picados, o mel e o sal. Cozinhe em fogo baixo por 20 minutos.",
+            "Bata tudo no liquidificador até virar um molho liso (assim ninguém vê o legume).",
+            "Finalize com manjericão rasgado e um fio de azeite cru. A família come uma porção inteira de vegetais sem perceber.",
+          ],
+        },
+      ],
     },
     {
       id: "paes",
@@ -289,6 +446,48 @@ const pt: MesaContent = {
       ],
       tecnica:
         "Pão morno conquista qualquer um. Sirva sempre levemente aquecido, com um bom azeite ou pasta caseira. O calor e o aroma fazem metade do trabalho.",
+      porque:
+        "O pão de fábrica é macio porque leva açúcar, óleo refinado e aditivos que aceleram a produção — e é justamente isso que inflama e vicia. O pão de fermentação natural usa só farinha, água e sal, fermentado lentamente por bactérias e leveduras selvagens. Essa fermentação longa 'pré-digere' parte do glúten e do amido, baixa o índice glicêmico (não dá o pico de açúcar) e gera ácidos que o intestino adora. É o mesmo princípio do pão que sustentou povos inteiros nas Escrituras: simples, vivo, feito com tempo. A transição funciona melhor pela cor: comece meio integral, meio branco, e vá escurecendo aos poucos — o paladar acompanha sem revolta.",
+      receitas: [
+        {
+          titulo: "Mini pizzas na fatia de pão",
+          tempo: "15 minutos",
+          rende: "4 porções",
+          ingredientes: [
+            "4 fatias de pão de fermentação natural",
+            "Molho de tomate caseiro (o da receita de legumes escondidos)",
+            "Queijo branco ou muçarela em fatias finas",
+            "Orégano, azeite e folhas de manjericão",
+            "Opcional: rodelas de tomate, milho, frango desfiado",
+          ],
+          preparo: [
+            "Preaqueça o forno a 200°C.",
+            "Passe uma colher de molho de tomate em cada fatia de pão.",
+            "Cubra com o queijo e os complementos que a família gosta.",
+            "Polvilhe orégano e regue com um fio de azeite.",
+            "Asse por 8 a 10 minutos, até o queijo derreter. Sirva morno — vira 'pizza da casa' saudável.",
+          ],
+        },
+        {
+          titulo: "Pão doce da tarde com mel e canela",
+          tempo: "15 minutos",
+          rende: "4 porções",
+          ingredientes: [
+            "4 fatias de pão de fermentação natural",
+            "1 colher de sopa de mel",
+            "1 colher de chá de canela",
+            "1 colher de sopa de manteiga (ou azeite suave)",
+            "Opcional: rodelas finas de banana ou maçã",
+          ],
+          preparo: [
+            "Aqueça uma frigideira em fogo médio com a manteiga.",
+            "Doure as fatias de pão dos dois lados até ficarem levemente crocantes.",
+            "Espalhe o mel e polvilhe a canela ainda quente.",
+            "Se quiser, cubra com banana ou maçã em rodelas finas.",
+            "Sirva morno no café da tarde — substitui o bolo industrializado e conquista as crianças.",
+          ],
+        },
+      ],
     },
     {
       id: "sobremesas",
@@ -314,6 +513,48 @@ const pt: MesaContent = {
       ],
       tecnica:
         "Nunca anuncie \"é sem açúcar\". Sirva como sobremesa normal. O doce da fruta e da tâmara satisfaz — mas se avisar que é \"fit\" antes, o cérebro já decide que não vai gostar.",
+      porque:
+        "O açúcar refinado entra puro e rápido no sangue, dá o pico de energia seguido da queda (que gera mais fome, irritação e o ciclo do vício). O doce natural da fruta e da tâmara vem 'embrulhado' em fibra, que faz o açúcar entrar devagar — satisfaz sem o efeito montanha-russa. A tâmara, além de adoçar, traz potássio, magnésio e ferro; a banana e a maçã assadas concentram a doçura no calor, sem precisar de uma grama de açúcar de fábrica. E há uma vantagem escondida: quando você adoça um bolo com vegetal (cenoura, beterraba, abóbora), a criança come uma porção de fibra e antioxidante achando que é guloseima. Deus celebrou o doce — 'come mel, meu filho, porque é bom' (Provérbios 24:13) — o ponto é trocar o doce morto pelo doce vivo.",
+      receitas: [
+        {
+          titulo: "Brigadeiro de tâmara e cacau",
+          tempo: "15 minutos (+ 20 de geladeira)",
+          rende: "≈ 15 docinhos",
+          ingredientes: [
+            "1 xícara de tâmaras sem caroço",
+            "3 colheres de sopa de cacau em pó 100%",
+            "2 colheres de sopa de pasta de amendoim ou castanha",
+            "1 pitada de sal",
+            "Cacau ou coco ralado para enrolar",
+          ],
+          preparo: [
+            "Se as tâmaras estiverem secas, deixe de molho em água quente por 10 minutos e escorra.",
+            "Processe as tâmaras, o cacau, a pasta de oleaginosa e o sal até formar uma massa grudenta.",
+            "Leve à geladeira por 20 minutos para firmar.",
+            "Modele bolinhas e passe no cacau ou coco ralado.",
+            "Substitui o brigadeiro de festa sem açúcar refinado — ninguém percebe a diferença.",
+          ],
+        },
+        {
+          titulo: "Maçã assada com mel, canela e nozes",
+          tempo: "30 minutos",
+          rende: "4 porções",
+          ingredientes: [
+            "4 maçãs",
+            "2 colheres de sopa de mel",
+            "1 colher de chá de canela",
+            "4 colheres de sopa de nozes picadas",
+            "Opcional: iogurte natural para servir",
+          ],
+          preparo: [
+            "Preaqueça o forno a 180°C. Retire o miolo das maçãs sem furar até o fim (formando uma 'cestinha').",
+            "Recheie cada maçã com nozes, um fio de mel e canela.",
+            "Coloque numa assadeira com um dedo de água no fundo.",
+            "Asse por 25 minutos, até a maçã ficar macia e perfumada.",
+            "Sirva morna, com uma colher de iogurte por cima. Tem cara de torta de restaurante.",
+          ],
+        },
+      ],
     },
   ],
 
@@ -453,26 +694,107 @@ const pt: MesaContent = {
       titulo: "Cordeiro (ou pernil) assado às ervas do campo",
       texto:
         "A peça central da festa bíblica. Carne assada lentamente com alho, alecrim, tomilho, hortelã e azeite, regada no próprio caldo. A casa se enche do aroma e a carne desmancha. Sirva com legumes assados ao redor. Vão achar que é banquete — e é.",
+      ingredientes: [
+        "1,5 kg de pernil de cordeiro (ou pernil suíno)",
+        "6 dentes de alho amassados",
+        "2 ramos de alecrim e 2 de tomilho",
+        "1 punhado de hortelã fresca",
+        "Suco de 1 limão",
+        "4 colheres de sopa de azeite",
+        "1 xícara de caldo de legumes ou água",
+        "Legumes para assar ao redor (batata, cenoura, cebola, abóbora)",
+        "Sal grosso e pimenta",
+      ],
+      preparo: [
+        "Faça uma pasta com alho, ervas picadas, limão, azeite, sal e pimenta. Esfregue por toda a carne, inclusive por baixo da pele. Deixe marinar de 2 horas a uma noite na geladeira.",
+        "Preaqueça o forno a 160°C (assar lento é o segredo da maciez).",
+        "Coloque a carne numa assadeira funda, despeje o caldo no fundo e cubra com papel-alumínio.",
+        "Asse por 2h30 a 3h, regando a carne com o próprio caldo a cada 40 minutos.",
+        "Espalhe os legumes ao redor na última 1 hora.",
+        "Retire o alumínio nos últimos 20 minutos e suba para 200°C para dourar.",
+        "Deixe descansar 15 minutos antes de cortar — a carne desmancha no garfo.",
+      ],
     },
     {
       titulo: "Frango inteiro dourado com limão e ervas",
       texto:
         "Mais acessível, igualmente impressionante. Temperado com pasta de alho, ervas e azeite, assado até a pele ficar dourada e crocante. Segredo: soltar a pele e temperar por baixo, e deixar descansar antes de cortar. É o prato que faz a sogra pedir a receita.",
+      ingredientes: [
+        "1 frango inteiro (≈ 1,8 kg)",
+        "5 dentes de alho amassados",
+        "Suco de 1 limão + 1 limão cortado ao meio",
+        "2 colheres de sopa de azeite",
+        "1 colher de sopa de alecrim e tomilho picados",
+        "1 colher de chá de páprica",
+        "Sal e pimenta",
+      ],
+      preparo: [
+        "Seque bem o frango com papel-toalha (pele seca = pele crocante).",
+        "Misture alho, ervas, suco de limão, azeite, páprica, sal e pimenta.",
+        "Com os dedos, solte cuidadosamente a pele do peito e das coxas e espalhe metade da pasta por baixo dela. Esfregue o resto por fora e por dentro.",
+        "Coloque as metades de limão dentro do frango. Deixe marinar 1 hora (ou de um dia para o outro).",
+        "Asse a 200°C por 1h10 a 1h30, regando com o caldo na metade do tempo, até a pele dourar e o suco sair claro ao furar a coxa.",
+        "Deixe descansar 15 minutos antes de cortar, para a carne não secar.",
+      ],
     },
     {
       titulo: "Grande tábua de pães, pastas e azeitonas",
       texto:
         "Entrada sofisticada e puro alimento bíblico: pão de fermentação natural, homus, babaganuche, azeite com ervas, azeitonas, tomates, queijo branco. Todos mergulham e partilham. É a mesa de Atos.",
+      ingredientes: [
+        "Pão de fermentação natural fatiado e levemente tostado",
+        "Homus: 1 lata de grão-de-bico, 2 colheres de sopa de tahine, suco de 1 limão, 1 dente de alho, azeite e sal",
+        "Babaganuche: 1 berinjela assada, 1 colher de tahine, limão, alho e azeite",
+        "Azeitonas, tomates-cereja, pepino e queijo branco em cubos",
+        "Azeite com ervas para regar",
+      ],
+      preparo: [
+        "Homus: bata o grão-de-bico escorrido com o tahine, o limão, o alho, sal e azeite até virar um creme liso (junte água gelada para afofar).",
+        "Babaganuche: asse a berinjela inteira a 200°C por 40 minutos até murchar, retire a polpa e amasse com tahine, limão, alho e azeite.",
+        "Toste levemente as fatias de pão e regue com azeite.",
+        "Monte tudo numa tábua grande: as pastas em tigelinhas, os vegetais e o queijo ao redor, as azeitonas espalhadas.",
+        "Sirva no centro da mesa para todos partilharem — é a comunhão de Atos, onde se partia o pão juntos.",
+      ],
     },
     {
       titulo: "Peixe assado inteiro para a mesa",
       texto:
         "Peixe inteiro assado com limão, ervas e azeite, levado à travessa, tem impacto visual enorme — e é mais fácil do que parece. Símbolo profundo nas Escrituras. Sirva com arroz e legumes coloridos.",
+      ingredientes: [
+        "1 peixe inteiro limpo (≈ 1,2 kg — robalo, pargo ou tilápia)",
+        "2 limões (1 em rodelas, 1 em suco)",
+        "1 maço de salsa e endro frescos",
+        "4 dentes de alho fatiados",
+        "4 colheres de sopa de azeite",
+        "Sal grosso e pimenta",
+      ],
+      preparo: [
+        "Preaqueça o forno a 200°C. Faça 3 cortes diagonais em cada lado do peixe.",
+        "Tempere por dentro e por fora com sal, pimenta, suco de limão e azeite.",
+        "Recheie a barriga com rodelas de limão, alho e os ramos de ervas; enfie um pouco de ervas nos cortes.",
+        "Coloque numa assadeira forrada e regue com mais azeite.",
+        "Asse por 30 a 35 minutos, até a carne soltar facilmente da espinha.",
+        "Leve inteiro à mesa na travessa, com arroz e legumes coloridos ao redor — impacto visual de restaurante.",
+      ],
     },
     {
       titulo: "Sobremesa de figos, mel e nozes",
       texto:
         "Encerre com a sobremesa mais bíblica que existe: figos assados com mel e nozes, servidos com iogurte ou creme natural. Parece de restaurante, sai em 15 minutos, sem uma grama de açúcar refinado.",
+      ingredientes: [
+        "8 figos frescos (ou secos hidratados)",
+        "3 colheres de sopa de mel",
+        "4 colheres de sopa de nozes picadas",
+        "1 pitada de canela",
+        "Iogurte natural ou ricota para servir",
+      ],
+      preparo: [
+        "Preaqueça o forno a 190°C. Corte os figos em cruz no topo, sem separar a base.",
+        "Abra levemente e regue com mel por dentro; polvilhe canela.",
+        "Coloque numa assadeira e asse por 10 a 12 minutos, até amaciarem e o mel borbulhar.",
+        "Espalhe as nozes por cima e volte ao forno por 2 minutos.",
+        "Sirva morno sobre uma colher de iogurte ou ricota. Doçura bíblica em 15 minutos.",
+      ],
     },
   ],
   domingoOrientacao:
@@ -622,6 +944,10 @@ const es: MesaContent = {
   lblSuaVersao: "Tu versión",
   lblVersaoFamilia: "La versión de la familia",
   lblTecnica: "La técnica clave",
+  lblPorque: "Por qué funciona (la ciencia)",
+  lblReceitas: "Recetas completas",
+  lblIngredientes: "Ingredientes",
+  lblPreparo: "Modo de preparación",
   categorias: [
     {
       id: "lentilhas",
@@ -648,6 +974,56 @@ const es: MesaContent = {
       ],
       tecnica:
         "Siempre dorar la cebolla lentamente antes. La base de cebolla caramelizada disfraza por completo el \"gusto a grano\" que algunas personas rechazan.",
+      porque:
+        "La lenteja y el garbanzo son proteína vegetal completa cuando se combinan con un cereal (arroz, pan) — forman todos los aminoácidos que el cuerpo necesita, sin la grasa inflamatoria de la carne procesada. Son ricos en fibra soluble, que alimenta las bacterias buenas del intestino y mantiene estable el azúcar en sangre (sin el pico-y-caída que da hambre e irritación en los niños). Su hierro vegetal se absorbe mejor junto con vitamina C — por eso un apretón de limón al final no es solo sabor, es nutrición. En la Biblia, fue con un plato de lentejas que Jacob alimentó a Esaú (Génesis 25): comida simple, barata y abundante, que sostiene a toda la casa.",
+      receitas: [
+        {
+          titulo: "Albóndigas doradas de lenteja (al horno)",
+          tempo: "35 minutos",
+          rende: "4 porciones (≈ 20 albóndigas)",
+          ingredientes: [
+            "2 tazas de lenteja cocida y bien escurrida",
+            "1 cebolla mediana rallada y sofrita hasta dorar",
+            "2 dientes de ajo machacados",
+            "1 huevo",
+            "4 cucharadas de harina de avena (o pan rallado integral)",
+            "2 cucharadas de perejil picado",
+            "1 cucharadita de comino",
+            "1 cucharadita de páprika dulce",
+            "Sal, pimienta y aceite de oliva",
+          ],
+          preparo: [
+            "Precalienta el horno a 200°C y forra una bandeja con papel de hornear.",
+            "Aplasta la lenteja con un tenedor hasta formar una pasta gruesa (deja algunos trozos para textura).",
+            "Mezcla la cebolla dorada, el ajo, el huevo, la harina, el perejil y los condimentos. La masa debe quedar moldeable — si está blanda, agrega 1 cucharada más de harina.",
+            "Forma bolitas del tamaño de una nuez, ponlas en la bandeja y pincela con aceite.",
+            "Hornea 25 minutos, girando a la mitad, hasta que doren por fuera.",
+            "Sirve con salsa de tomate casera sobre la pasta, o en el pan como 'albóndiga'.",
+          ],
+        },
+        {
+          titulo: "Hamburguesa de garbanzo y zanahoria",
+          tempo: "30 minutos",
+          rende: "6 hamburguesas",
+          ingredientes: [
+            "2 tazas de garbanzo cocido",
+            "1 zanahoria mediana rallada fina",
+            "Media cebolla rallada",
+            "1 huevo",
+            "5 cucharadas de avena en hojuelas",
+            "1 cucharadita de comino",
+            "1 cucharadita de cúrcuma",
+            "Cilantro o perejil al gusto, sal y aceite",
+          ],
+          preparo: [
+            "Procesa el garbanzo con el huevo hasta formar una pasta gruesa.",
+            "Mezcla la zanahoria, la cebolla, la avena y los condimentos. Deja reposar 10 minutos (la avena absorbe la humedad y da liga).",
+            "Forma discos de 1,5 cm de alto.",
+            "Dora en sartén con un hilo de aceite, 4 minutos por lado, O hornea a 200°C por 20 minutos.",
+            "Monta en pan de masa madre con hojas, tomate y una salsa de yogur con limón.",
+          ],
+        },
+      ],
     },
     {
       id: "peixes",
@@ -674,6 +1050,48 @@ const es: MesaContent = {
       ],
       tecnica:
         "Limón y hierbas frescas (eneldo y perejil) eliminan el olor fuerte. Sazona con anticipación y nunca cocines de más — el pescado reseco crea la mala fama.",
+      porque:
+        "El pescado es la proteína más antiinflamatoria de la mesa por el omega-3 (EPA y DHA), que el cuerpo usa para 'apagar' la inflamación celular — el opuesto químico de los aceites de soya y maíz de los ultraprocesados. El DHA es literalmente materia prima del cerebro del niño en formación, por eso pescado 2 a 3 veces por semana es uno de los mejores hábitos que una familia puede tener. El 'olor a pescado' que aleja a la gente viene de la oxidación cuando el pescado es viejo o se cocina de más — pescado fresco, sazonado con limón y horneado en su punto, no tiene ese olor. El pescado es símbolo profundo en las Escrituras: de la pesca de los discípulos a la multiplicación que alimentó a la multitud.",
+      receitas: [
+        {
+          titulo: "Pescado apanado al horno (sin fritura)",
+          tempo: "25 minutos",
+          rende: "4 porciones",
+          ingredientes: [
+            "4 filetes de pescado blanco (tilapia, merluza o corvina)",
+            "1 huevo batido",
+            "1 taza de pan rallado integral",
+            "4 cucharadas de queso parmesano rallado",
+            "1 cucharadita de orégano",
+            "Ralladura de medio limón",
+            "Jugo de medio limón, sal, pimienta y aceite",
+          ],
+          preparo: [
+            "Precalienta el horno a 220°C. Sazona los filetes con limón, sal y pimienta.",
+            "Mezcla el pan rallado, el parmesano, el orégano y la ralladura de limón en un plato.",
+            "Pasa cada filete por el huevo y luego por la mezcla crocante, presionando bien.",
+            "Ponlos en una bandeja con papel de hornear y riega con un hilo de aceite.",
+            "Hornea 15 a 18 minutos, hasta dorar la costra. Se vuelve 'pescado apanado' que el niño come con la mano.",
+          ],
+        },
+        {
+          titulo: "Dedos de pescado con salsa de yogur",
+          tempo: "20 minutos",
+          rende: "4 porciones (picada)",
+          ingredientes: [
+            "500 g de filete de pescado en tiras",
+            "1 huevo + media taza de pan rallado integral con hierbas",
+            "Para la salsa: 1 pote de yogur natural, jugo de medio limón, 1 cucharada de perejil picado, sal",
+            "Aceite, sal y pimienta",
+          ],
+          preparo: [
+            "Sazona las tiras con sal, pimienta y un poco de limón.",
+            "Apana en huevo y pan rallado y hornea a 220°C por 12 a 15 minutos (o dora rápido en sartén con aceite).",
+            "Mezcla los ingredientes de la salsa de yogur.",
+            "Sirve los dedos con la salsa para mojar — se vuelve picada de la casa, no 'cena de pescado'.",
+          ],
+        },
+      ],
     },
     {
       id: "legumes",
@@ -705,6 +1123,51 @@ const es: MesaContent = {
       ],
       tecnica:
         "Dorar lo es todo. La verdura asada hasta dorar desarrolla azúcar natural (caramelización) que transforma el sabor. Hervida en agua pierde color, sabor y textura.",
+      porque:
+        "Las verduras coloridas cargan los fitoquímicos que combaten la inflamación — el rojo del tomate (licopeno), el naranja de la zanahoria y la ahuyama (betacaroteno), el verde oscuro de la col (luteína y magnesio). Cuantos más colores en el plato, más amplio el escudo antioxidante. Su fibra es el 'alimento' de las bacterias buenas del intestino, y un intestino equilibrado significa menos inflamación en todo el cuerpo y hasta mejor humor. El secreto es la forma de preparar: hervir en agua tira los nutrientes y el color; asar o saltear hasta dorar lo preserva todo y crea el azúcar natural (caramelización) que hace que hasta quien 'no come verdura' la devore. Comer lo que la tierra da en variedad es volver a la mesa del Edén — 'toda planta que da semilla' (Génesis 1:29).",
+      receitas: [
+        {
+          titulo: "Palitos crocantes de verduras asadas",
+          tempo: "30 minutos",
+          rende: "4 porciones",
+          ingredientes: [
+            "2 zanahorias en palitos",
+            "1 calabacín en palitos",
+            "Media ahuyama en palitos",
+            "2 cucharadas de aceite de oliva",
+            "1 cucharadita de páprika dulce",
+            "Media cucharadita de ajo en polvo",
+            "Sal y orégano",
+          ],
+          preparo: [
+            "Precalienta el horno a 220°C.",
+            "Mezcla todos los palitos con el aceite y los condimentos en un tazón, hasta cubrir bien.",
+            "Extiende en una bandeja en capa única (sin amontonar — si no, se cocinan al vapor en vez de dorar).",
+            "Hornea 22 a 25 minutos, girando a la mitad, hasta que las puntas queden doradas y crocantes.",
+            "Sirve como 'papas de la casa', con salsa de yogur o homus para mojar.",
+          ],
+        },
+        {
+          titulo: "Salsa de tomate con verduras escondidas",
+          tempo: "30 minutos",
+          rende: "salsa para 4-6 porciones de pasta",
+          ingredientes: [
+            "6 tomates maduros (o 1 lata de tomate pelado)",
+            "1 zanahoria rallada fina",
+            "1 calabacín rallado fino",
+            "1 cebolla y 3 dientes de ajo",
+            "1 pizca de miel (equilibra la acidez)",
+            "Albahaca fresca, aceite y sal",
+          ],
+          preparo: [
+            "Dora la cebolla y el ajo en aceite, sin prisa.",
+            "Agrega la zanahoria y el calabacín rallados y sofríe 5 minutos — van desapareciendo en la textura.",
+            "Incorpora los tomates picados, la miel y la sal. Cocina a fuego bajo 20 minutos.",
+            "Licúa todo hasta obtener una salsa lisa (así nadie ve la verdura).",
+            "Finaliza con albahaca y un hilo de aceite crudo. La familia come una porción entera de vegetales sin notarlo.",
+          ],
+        },
+      ],
     },
     {
       id: "paes",
@@ -731,6 +1194,48 @@ const es: MesaContent = {
       ],
       tecnica:
         "El pan tibio conquista a cualquiera. Sírvelo siempre levemente caliente, con un buen aceite o pasta casera. El calor y el aroma hacen la mitad del trabajo.",
+      porque:
+        "El pan de fábrica es suave porque lleva azúcar, aceite refinado y aditivos que aceleran la producción — y es justo eso lo que inflama y engancha. El pan de masa madre usa solo harina, agua y sal, fermentado lentamente por bacterias y levaduras silvestres. Esa fermentación larga 'pre-digiere' parte del gluten y del almidón, baja el índice glucémico (no da el pico de azúcar) y genera ácidos que el intestino ama. Es el mismo principio del pan que sostuvo a pueblos enteros en las Escrituras: simple, vivo, hecho con tiempo. La transición funciona mejor por el color: empieza mitad integral, mitad blanco, y ve oscureciendo poco a poco — el paladar acompaña sin rebeldía.",
+      receitas: [
+        {
+          titulo: "Mini pizzas sobre la tajada de pan",
+          tempo: "15 minutos",
+          rende: "4 porciones",
+          ingredientes: [
+            "4 tajadas de pan de masa madre",
+            "Salsa de tomate casera (la de la receta de verduras escondidas)",
+            "Queso blanco o mozzarella en tajadas finas",
+            "Orégano, aceite y hojas de albahaca",
+            "Opcional: rodajas de tomate, maíz, pollo desmechado",
+          ],
+          preparo: [
+            "Precalienta el horno a 200°C.",
+            "Unta una cucharada de salsa de tomate en cada tajada de pan.",
+            "Cubre con el queso y los complementos que la familia quiera.",
+            "Espolvorea orégano y riega con un hilo de aceite.",
+            "Hornea 8 a 10 minutos, hasta que el queso derrita. Sirve tibio — se vuelve 'pizza de la casa' saludable.",
+          ],
+        },
+        {
+          titulo: "Pancito dulce de la tarde con miel y canela",
+          tempo: "15 minutos",
+          rende: "4 porciones",
+          ingredientes: [
+            "4 tajadas de pan de masa madre",
+            "1 cucharada de miel",
+            "1 cucharadita de canela",
+            "1 cucharada de mantequilla (o aceite suave)",
+            "Opcional: rodajas finas de banano o manzana",
+          ],
+          preparo: [
+            "Calienta una sartén a fuego medio con la mantequilla.",
+            "Dora las tajadas de pan por ambos lados hasta quedar levemente crocantes.",
+            "Unta la miel y espolvorea la canela aún caliente.",
+            "Si quieres, cubre con banano o manzana en rodajas finas.",
+            "Sirve tibio en las onces — reemplaza la torta industrializada y conquista a los niños.",
+          ],
+        },
+      ],
     },
     {
       id: "sobremesas",
@@ -756,6 +1261,48 @@ const es: MesaContent = {
       ],
       tecnica:
         "Nunca anuncies \"es sin azúcar\". Sírvelo como postre normal. El dulce de la fruta y del dátil satisface — pero si avisas que es \"fit\" antes, el cerebro ya decide que no le va a gustar.",
+      porque:
+        "El azúcar refinada entra pura y rápida en la sangre, da el pico de energía seguido de la caída (que genera más hambre, irritación y el ciclo de la adicción). El dulce natural de la fruta y del dátil viene 'envuelto' en fibra, que hace que el azúcar entre despacio — satisface sin el efecto montaña rusa. El dátil, además de endulzar, trae potasio, magnesio y hierro; el banano y la manzana asados concentran la dulzura con el calor, sin necesitar un solo gramo de azúcar de fábrica. Y hay una ventaja escondida: cuando endulzas una torta con vegetal (zanahoria, remolacha, ahuyama), el niño come una porción de fibra y antioxidante creyendo que es golosina. Dios celebró lo dulce — 'come miel, hijo mío, porque es buena' (Proverbios 24:13) — el punto es cambiar el dulce muerto por el dulce vivo.",
+      receitas: [
+        {
+          titulo: "Bombón de dátil y cacao",
+          tempo: "15 minutos (+ 20 de nevera)",
+          rende: "≈ 15 bombones",
+          ingredientes: [
+            "1 taza de dátiles sin hueso",
+            "3 cucharadas de cacao en polvo 100%",
+            "2 cucharadas de mantequilla de maní o de fruto seco",
+            "1 pizca de sal",
+            "Cacao o coco rallado para rebozar",
+          ],
+          preparo: [
+            "Si los dátiles están secos, déjalos en agua caliente 10 minutos y escúrrelos.",
+            "Procesa los dátiles, el cacao, la mantequilla de fruto seco y la sal hasta formar una masa pegajosa.",
+            "Lleva a la nevera 20 minutos para que firme.",
+            "Forma bolitas y rebózalas en cacao o coco rallado.",
+            "Reemplaza el bombón de fiesta sin azúcar refinada — nadie nota la diferencia.",
+          ],
+        },
+        {
+          titulo: "Manzana asada con miel, canela y nueces",
+          tempo: "30 minutos",
+          rende: "4 porciones",
+          ingredientes: [
+            "4 manzanas",
+            "2 cucharadas de miel",
+            "1 cucharadita de canela",
+            "4 cucharadas de nueces picadas",
+            "Opcional: yogur natural para servir",
+          ],
+          preparo: [
+            "Precalienta el horno a 180°C. Retira el corazón de las manzanas sin perforar hasta el fondo (formando una 'cestita').",
+            "Rellena cada manzana con nueces, un hilo de miel y canela.",
+            "Ponlas en una bandeja con un dedo de agua en el fondo.",
+            "Hornea 25 minutos, hasta que la manzana esté blanda y perfumada.",
+            "Sirve tibia, con una cucharada de yogur encima. Tiene cara de tarta de restaurante.",
+          ],
+        },
+      ],
     },
   ],
 
@@ -895,26 +1442,107 @@ const es: MesaContent = {
       titulo: "Cordero (o pernil) asado a las hierbas del campo",
       texto:
         "La pieza central de la fiesta bíblica. Carne asada lentamente con ajo, romero, tomillo, hierbabuena y aceite, bañada en su propio jugo. La casa se llena del aroma y la carne se deshace. Sírvela con verduras asadas alrededor. Van a pensar que es un banquete — y lo es.",
+      ingredientes: [
+        "1,5 kg de pernil de cordero (o pernil de cerdo)",
+        "6 dientes de ajo machacados",
+        "2 ramas de romero y 2 de tomillo",
+        "1 puñado de hierbabuena fresca",
+        "Jugo de 1 limón",
+        "4 cucharadas de aceite de oliva",
+        "1 taza de caldo de verduras o agua",
+        "Verduras para asar alrededor (papa, zanahoria, cebolla, ahuyama)",
+        "Sal gruesa y pimienta",
+      ],
+      preparo: [
+        "Haz una pasta con ajo, hierbas picadas, limón, aceite, sal y pimienta. Frota toda la carne, incluso debajo de la piel. Marina de 2 horas a una noche en la nevera.",
+        "Precalienta el horno a 160°C (asar lento es el secreto de la suavidad).",
+        "Pon la carne en una bandeja honda, vierte el caldo al fondo y cubre con papel aluminio.",
+        "Hornea 2h30 a 3h, bañando la carne con su propio jugo cada 40 minutos.",
+        "Reparte las verduras alrededor en la última 1 hora.",
+        "Retira el aluminio en los últimos 20 minutos y sube a 200°C para dorar.",
+        "Deja reposar 15 minutos antes de cortar — la carne se deshace en el tenedor.",
+      ],
     },
     {
       titulo: "Pollo entero dorado con limón y hierbas",
       texto:
         "Más accesible, igual de impresionante. Sazonado con pasta de ajo, hierbas y aceite, asado hasta que la piel quede dorada y crocante. Secreto: soltar la piel y sazonar por debajo, y dejarlo reposar antes de cortar. Es el plato que hace que la suegra pida la receta.",
+      ingredientes: [
+        "1 pollo entero (≈ 1,8 kg)",
+        "5 dientes de ajo machacados",
+        "Jugo de 1 limón + 1 limón cortado a la mitad",
+        "2 cucharadas de aceite de oliva",
+        "1 cucharada de romero y tomillo picados",
+        "1 cucharadita de páprika",
+        "Sal y pimienta",
+      ],
+      preparo: [
+        "Seca bien el pollo con papel de cocina (piel seca = piel crocante).",
+        "Mezcla ajo, hierbas, jugo de limón, aceite, páprika, sal y pimienta.",
+        "Con los dedos, suelta con cuidado la piel de la pechuga y los muslos y reparte la mitad de la pasta por debajo. Frota el resto por fuera y por dentro.",
+        "Pon las mitades de limón dentro del pollo. Marina 1 hora (o de un día para otro).",
+        "Hornea a 200°C por 1h10 a 1h30, bañando con el jugo a la mitad, hasta que la piel dore y el jugo salga claro al pinchar el muslo.",
+        "Deja reposar 15 minutos antes de cortar, para que la carne no se seque.",
+      ],
     },
     {
       titulo: "Gran tabla de panes, pastas y aceitunas",
       texto:
         "Entrada sofisticada y puro alimento bíblico: pan de masa madre, homus, babaganoush, aceite con hierbas, aceitunas, tomates, queso blanco. Todos mojan y comparten. Es la mesa de Hechos.",
+      ingredientes: [
+        "Pan de masa madre en tajadas y levemente tostado",
+        "Homus: 1 lata de garbanzo, 2 cucharadas de tahini, jugo de 1 limón, 1 diente de ajo, aceite y sal",
+        "Babaganoush: 1 berenjena asada, 1 cucharada de tahini, limón, ajo y aceite",
+        "Aceitunas, tomates cherry, pepino y queso blanco en cubos",
+        "Aceite con hierbas para regar",
+      ],
+      preparo: [
+        "Homus: licúa el garbanzo escurrido con el tahini, el limón, el ajo, sal y aceite hasta una crema lisa (agrega agua helada para esponjar).",
+        "Babaganoush: asa la berenjena entera a 200°C por 40 minutos hasta que se ablande, retira la pulpa y aplástala con tahini, limón, ajo y aceite.",
+        "Tuesta levemente las tajadas de pan y riégalas con aceite.",
+        "Monta todo en una tabla grande: las pastas en tazoncitos, los vegetales y el queso alrededor, las aceitunas repartidas.",
+        "Sirve en el centro de la mesa para que todos compartan — es la comunión de Hechos, donde se partía el pan juntos.",
+      ],
     },
     {
       titulo: "Pescado asado entero para la mesa",
       texto:
         "Pescado entero asado con limón, hierbas y aceite, llevado en la bandeja, tiene un impacto visual enorme — y es más fácil de lo que parece. Símbolo profundo en las Escrituras. Sírvelo con arroz y verduras coloridas.",
+      ingredientes: [
+        "1 pescado entero limpio (≈ 1,2 kg — róbalo, pargo o tilapia)",
+        "2 limones (1 en rodajas, 1 en jugo)",
+        "1 manojo de perejil y eneldo frescos",
+        "4 dientes de ajo en láminas",
+        "4 cucharadas de aceite de oliva",
+        "Sal gruesa y pimienta",
+      ],
+      preparo: [
+        "Precalienta el horno a 200°C. Haz 3 cortes diagonales en cada lado del pescado.",
+        "Sazona por dentro y por fuera con sal, pimienta, jugo de limón y aceite.",
+        "Rellena la barriga con rodajas de limón, ajo y las ramas de hierbas; mete un poco de hierbas en los cortes.",
+        "Ponlo en una bandeja forrada y riega con más aceite.",
+        "Hornea 30 a 35 minutos, hasta que la carne se suelte fácilmente de la espina.",
+        "Llévalo entero a la mesa en la bandeja, con arroz y verduras coloridas alrededor — impacto visual de restaurante.",
+      ],
     },
     {
       titulo: "Postre de higos, miel y nueces",
       texto:
         "Cierra con el postre más bíblico que existe: higos asados con miel y nueces, servidos con yogur o crema natural. Parece de restaurante, sale en 15 minutos, sin un solo gramo de azúcar refinada.",
+      ingredientes: [
+        "8 higos frescos (o secos hidratados)",
+        "3 cucharadas de miel",
+        "4 cucharadas de nueces picadas",
+        "1 pizca de canela",
+        "Yogur natural o ricotta para servir",
+      ],
+      preparo: [
+        "Precalienta el horno a 190°C. Corta los higos en cruz en la punta, sin separar la base.",
+        "Ábrelos levemente y riega miel por dentro; espolvorea canela.",
+        "Ponlos en una bandeja y hornea 10 a 12 minutos, hasta que se ablanden y la miel burbujee.",
+        "Reparte las nueces encima y vuelve al horno 2 minutos.",
+        "Sirve tibio sobre una cucharada de yogur o ricotta. Dulzura bíblica en 15 minutos.",
+      ],
     },
   ],
   domingoOrientacao:

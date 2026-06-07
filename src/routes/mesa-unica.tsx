@@ -15,6 +15,9 @@ import {
   Check,
   User,
   Users,
+  HeartPulse,
+  ChefHat,
+  Clock,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useLang, useStoredImageMap } from "@/lib/store";
@@ -146,6 +149,28 @@ function Landing({
                 es={ES.pratos[i].texto}
                 className="block text-sm leading-relaxed text-muted-foreground"
               />
+              <h5 className="mb-1.5 mt-3 text-[11px] font-medium uppercase tracking-wider text-foreground">
+                {c.lblIngredientes}
+              </h5>
+              <ul className="space-y-1">
+                {p.ingredientes.map((it, j) => (
+                  <li key={j} className="flex items-start gap-2 text-[13px] text-muted-foreground">
+                    <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-olive" />
+                    <Ed k={`mesa.domingo.${i + 1}.ing.${j}`} pt={PT.pratos[i].ingredientes[j]} es={ES.pratos[i].ingredientes[j]} />
+                  </li>
+                ))}
+              </ul>
+              <h5 className="mb-1.5 mt-3 text-[11px] font-medium uppercase tracking-wider text-foreground">
+                {c.lblPreparo}
+              </h5>
+              <ol className="space-y-1.5">
+                {p.preparo.map((s, j) => (
+                  <li key={j} className="flex gap-2.5 text-[13px] text-muted-foreground">
+                    <span className="font-serif text-xs text-earth">{j + 1}.</span>
+                    <Ed k={`mesa.domingo.${i + 1}.prep.${j}`} pt={PT.pratos[i].preparo[j]} es={ES.pratos[i].preparo[j]} className="leading-relaxed" />
+                  </li>
+                ))}
+              </ol>
             </ExpandCard>
           ))}
         </div>
@@ -264,6 +289,59 @@ function CategoryDetail({
             </p>
           </div>
           <Ed as="p" k={`${base}.tecnica`} pt={cp.tecnica} es={ce.tecnica} className="block text-sm leading-relaxed text-foreground" />
+        </div>
+
+        {/* Por que funciona — ciência */}
+        <div className="mt-4 rounded-2xl bg-secondary/40 p-4">
+          <div className="mb-1 flex items-center gap-2">
+            <HeartPulse className="h-4 w-4 text-olive" />
+            <p className="text-[11px] font-medium uppercase tracking-wider text-olive">
+              {c.lblPorque}
+            </p>
+          </div>
+          <Ed as="p" k={`${base}.porque`} pt={cp.porque} es={ce.porque} className="block text-sm leading-relaxed text-muted-foreground" />
+        </div>
+
+        {/* Receitas completas */}
+        <div className="mt-5 mb-2 flex items-center gap-2">
+          <ChefHat className="h-4 w-4 text-earth" />
+          <h2 className="font-serif text-lg text-foreground">{c.lblReceitas}</h2>
+        </div>
+        <div className="space-y-3">
+          {cat.receitas.map((r, ri) => (
+            <div key={ri} className="overflow-hidden rounded-2xl bg-card shadow-card">
+              <div className="border-b border-border/50 bg-secondary/40 px-4 py-2.5">
+                <Ed as="p" k={`${base}.rec.${ri}.titulo`} pt={cp.receitas[ri].titulo} es={ce.receitas[ri].titulo} className="block font-serif text-base text-foreground" />
+                <p className="mt-0.5 inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+                  <Clock className="h-3 w-3" /> {r.tempo} · {r.rende}
+                </p>
+              </div>
+              <div className="px-4 py-3">
+                <h5 className="mb-1.5 text-[11px] font-medium uppercase tracking-wider text-foreground">
+                  {c.lblIngredientes}
+                </h5>
+                <ul className="space-y-1">
+                  {r.ingredientes.map((it, j) => (
+                    <li key={j} className="flex items-start gap-2 text-[13px] text-muted-foreground">
+                      <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-olive" />
+                      <Ed k={`${base}.rec.${ri}.ing.${j}`} pt={cp.receitas[ri].ingredientes[j]} es={ce.receitas[ri].ingredientes[j]} />
+                    </li>
+                  ))}
+                </ul>
+                <h5 className="mb-1.5 mt-3 text-[11px] font-medium uppercase tracking-wider text-foreground">
+                  {c.lblPreparo}
+                </h5>
+                <ol className="space-y-1.5">
+                  {r.preparo.map((p, j) => (
+                    <li key={j} className="flex gap-2.5 text-[13px] text-muted-foreground">
+                      <span className="font-serif text-xs text-earth">{j + 1}.</span>
+                      <Ed k={`${base}.rec.${ri}.prep.${j}`} pt={cp.receitas[ri].preparo[j]} es={ce.receitas[ri].preparo[j]} className="leading-relaxed" />
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </div>
+          ))}
         </div>
         <div className="h-6" />
       </div>

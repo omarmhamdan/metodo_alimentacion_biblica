@@ -25,6 +25,8 @@ export interface Dia {
   refeicoes: Refeicao[];
   hidratacao: string;
   ritual?: boolean;
+  ciencia?: string;
+  snacks?: string[];
 }
 
 export interface ItemFreio {
@@ -75,6 +77,7 @@ export interface ProtocoloContent {
   secRitual: string;
   secEsperar: string;
   secErros: string;
+  secMitos: string;
   secFaq: string;
   secFinal: string;
   diaLabel: string;
@@ -86,7 +89,12 @@ export interface ProtocoloContent {
   lblAoAcordar: string;
   lblHidratacao: string;
   lblPorque: string;
+  lblCiencia: string;
+  lblSnacks: string;
   lblDicaBeatriz: string;
+
+  // Mitos
+  mitos: ItemFreio[];
 
   // Abertura
   aberturaTitulo: string;
@@ -178,6 +186,7 @@ const pt: ProtocoloContent = {
   secRitual: "Bônus secreto · Ritual de Drenagem",
   secEsperar: "O que esperar em cada fase",
   secErros: "Erros que travam o protocolo",
+  secMitos: "Mitos e verdades",
   secFaq: "Perguntas que toda mulher faz",
   secFinal: "Palavra final",
   diaLabel: "Dia",
@@ -187,6 +196,8 @@ const pt: ProtocoloContent = {
   lblSubstituicoes: "Substituições",
   lblAoAcordar: "Ao acordar",
   lblHidratacao: "Hidratação e movimento",
+  lblCiencia: "O que acontece no seu corpo hoje",
+  lblSnacks: "Se bater fome: lanches liberados",
   lblPorque: "Por que funciona",
   lblDicaBeatriz: "Dica da Beatriz",
 
@@ -355,6 +366,13 @@ const pt: ProtocoloContent = {
       ],
       hidratacao:
         "Beba pelo menos 2 litros de água ao longo do dia. Se puder, faça uma caminhada leve de 15 minutos — não para queimar, mas para ativar a circulação e ajudar o corpo a abrir as comportas.",
+      ciencia:
+        "Hoje o corpo recebe o primeiro choque de informação nova: menos sódio, menos açúcar, menos óleo refinado. Nas primeiras 24 horas ele ainda está 'segurando' líquido por hábito, então não espere o desinchaço agora — espere a virada de chave. O gengibre e a cúrcuma da Água do Jordão começam a baixar os marcadores de inflamação, e a fibra da aveia e dos legumes começa a alimentar o intestino. A leve fome que você sente é o corpo procurando o açúcar de sempre e não achando. É normal e passa.",
+      snacks: [
+        "1 fruta (maçã, pera ou um punhado de uvas) com 3 castanhas",
+        "1 cenoura ou pepino em palitos com um fio de azeite e limão",
+        "1 xícara de chá de gengibre com hortelã, sem açúcar",
+      ],
     },
     {
       numero: 2,
@@ -432,6 +450,13 @@ const pt: ProtocoloContent = {
       ],
       hidratacao:
         "2 litros de água. Se a vontade de doce aparecer (e ela vai, hoje), não lute — coma uma fruta ou uma tâmara. Substituir é mais inteligente do que resistir.",
+      ciencia:
+        "A leve dor de cabeça e a vontade de doce de hoje têm nome: abstinência. Seu cérebro estava acostumado a doses regulares de açúcar e sódio, que ativam os mesmos circuitos de recompensa de uma substância viciante. Ao cortar, ele protesta por 24 a 48 horas — é o pico do desconforto e também o sinal mais claro de que está funcionando. Os rins, agora com menos sódio, começam a liberar o líquido retido: por isso você vai mais ao banheiro. A chia e o iogurte de hoje estabilizam o açúcar do sangue e seguram a fome.",
+      snacks: [
+        "1 iogurte natural integral com canela",
+        "1 tâmara ou 2 ameixas secas (mata a vontade de doce na hora)",
+        "1 punhado de frutas vermelhas congeladas",
+      ],
     },
     {
       numero: 3,
@@ -511,6 +536,13 @@ const pt: ProtocoloContent = {
       ],
       hidratacao:
         "2 a 2,5 litros de água hoje — é dia de drenagem, o corpo precisa de líquido limpo para soltar o retido. Caminhada leve de 20 minutos, se possível, ajuda muito hoje.",
+      ciencia:
+        "Hoje é o pico da drenagem. Com o sódio em baixa há dois dias, o corpo finalmente inverte a chave hormonal que segurava água (a aldosterona cede) e começa a eliminar o líquido acumulado de verdade. Por isso o Ritual de Drenagem da noite cai exatamente aqui: o calor do escalda-pés dilata os vasos e a automassagem empurra a linfa de baixo para cima, somando ao trabalho que o corpo já está fazendo por dentro. A vitamina verde da manhã entrega clorofila, magnésio e potássio — o trio que equilibra o sódio e desincha. Beber bastante água hoje não é contraditório: é o que dá ao corpo permissão para soltar o resto.",
+      snacks: [
+        "1 copo de água de coco natural (repõe potássio)",
+        "Palitos de pepino e aipo com homus",
+        "1 laranja ou mexerica",
+      ],
     },
     {
       numero: 4,
@@ -587,6 +619,13 @@ const pt: ProtocoloContent = {
       ],
       hidratacao:
         "Mantenha os 2 litros. Repare como a sede está diferente quando o corpo está hidratado de verdade — ele para de estocar água.",
+      ciencia:
+        "Depois do pico de ontem, hoje o corpo se reorganiza no novo equilíbrio — e é por isso que a manhã do Dia 4 traz a primeira grande surpresa no espelho. A inflamação caiu o suficiente para o rosto afinar e os olhos desincharem. A energia sobe porque o açúcar do sangue parou de fazer montanha-russa: sem os picos e quedas, o corpo tem combustível estável o dia todo. Muitas mulheres relatam dormir a noite inteira pela primeira vez em meses — sono melhor é consequência direta de menos inflamação e açúcar estável. A lentilha e o ovo de hoje sustentam essa energia com proteína de verdade.",
+      snacks: [
+        "1 ovo cozido com uma pitada de sal e pimenta",
+        "1 punhado de amêndoas ou nozes",
+        "Rodelas de maçã com canela",
+      ],
     },
     {
       numero: 5,
@@ -663,6 +702,13 @@ const pt: ProtocoloContent = {
       ],
       hidratacao:
         "Mantenha os 2 litros de água. Hoje, experimente vestir aquela roupa que estava apertada no início da semana — só para sentir, no corpo, o que está acontecendo.",
+      ciencia:
+        "A esta altura a inflamação cedeu bastante e o corpo entrou em ritmo de cruzeiro. O paladar já começou a se reeducar: alimentos que pareciam 'sem graça' no Dia 1 agora têm sabor, porque seus receptores não estão mais saturados de açúcar e sódio. Por isso o cardápio de hoje pode ser mais generoso sem culpa — o corpo respondendo merece ser nutrido, não punido. A crepioca e o grão-de-bico trazem proteína e fibra que mantêm a saciedade longa. Comer o suficiente é o que evita o efeito sanfona: privação gera compensação, equilíbrio gera constância.",
+      snacks: [
+        "Crepioca pequena com queijo branco",
+        "1 punhado de grão-de-bico crocante assado",
+        "1 fruta da estação com pasta de amendoim",
+      ],
     },
     {
       numero: 6,
@@ -745,6 +791,13 @@ const pt: ProtocoloContent = {
       ],
       hidratacao:
         "2 litros de água. Hoje, separe mentalmente (ou anote) três receitas do Método Alimentação Bíblica que você vai fazer na próxima semana. A transição começa na cabeça antes de começar na cozinha.",
+      ciencia:
+        "O que aconteceu em seis dias não foi só desinchaço: você reprogramou hábitos. O cérebro forma uma rotina nova em cerca de uma a duas semanas de repetição, e você já está na metade desse caminho. As bactérias do intestino também mudaram — alimentadas com fibra de verdade em vez de açúcar, a população que reduz inflamação cresceu, e isso se sente em digestão melhor e menos gases. O curry de hoje traz cúrcuma com gordura boa do leite de coco e uma pitada de pimenta: a combinação exata que multiplica a absorção da curcumina anti-inflamatória. Hoje o corpo já sabe o caminho — só falta você decidir continuar nele.",
+      snacks: [
+        "1 xícara de sopa de legumes da ceia (faça a mais)",
+        "1 punhado de sementes de abóbora ou girassol",
+        "1 banana com canela",
+      ],
     },
     {
       numero: 7,
@@ -825,6 +878,13 @@ const pt: ProtocoloContent = {
       ],
       hidratacao:
         "Mantenha a hidratação. E hoje, antes de dormir, faça uma oração de gratidão pelo corpo que respondeu. Amanhã começa a vida nova — direto no Método Alimentação Bíblica.",
+      ciencia:
+        "No sétimo dia, o que você sente não é só leveza física — é a prova de um princípio: o corpo foi desenhado para se curar quando você para de atrapalhar. Em uma semana, os marcadores de inflamação caíram, o líquido retido saiu, o açúcar do sangue se estabilizou, o sono melhorou e o paladar se reeducou. Nada disso foi mágica nem privação: foi comida de verdade, água e descanso, na ordem certa. O salmão de hoje fecha a semana com a maior dose de ômega-3 do protocolo. A partir de amanhã, o segredo é só não voltar atrás — e o Método Alimentação Bíblica é o caminho para manter, para sempre, o que você destravou em sete dias.",
+      snacks: [
+        "Bowl pequeno de iogurte com frutas e mel",
+        "1 punhado de nozes ou castanhas",
+        "Figos frescos ou secos com um fio de mel",
+      ],
     },
   ],
 
@@ -1080,6 +1140,39 @@ const pt: ProtocoloContent = {
     },
   ],
 
+  mitos: [
+    {
+      nome: "\"Comer gordura engorda e inflama.\"",
+      texto:
+        "Mito. A gordura boa — azeite de oliva, abacate, oleaginosas, ômega-3 do peixe — é justamente anti-inflamatória e dá saciedade. O que inflama são os óleos vegetais refinados (soja, milho, canola) e a gordura escondida nos ultraprocessados. Não tenha medo do fio de azeite cru: ele é remédio.",
+    },
+    {
+      nome: "\"Fruta tem muito açúcar, é melhor cortar.\"",
+      texto:
+        "Mito. O açúcar da fruta vem embrulhado em fibra, água e antioxidantes, então entra devagar no sangue — nada a ver com o açúcar refinado puro. A fruta inteira é liberada e incentivada. O cuidado é só com suco coado em excesso, que perde a fibra.",
+    },
+    {
+      nome: "\"Inchaço é só gordura, é só comer menos.\"",
+      texto:
+        "Mito. Boa parte do que você chama de 'gordura' no rosto, nas mãos e na barriga é líquido retido pela inflamação e pelo excesso de sódio. Por isso o desinchaço aparece em poucos dias quando você corta o ultraprocessado e bebe mais água — rápido demais para ser gordura de verdade.",
+    },
+    {
+      nome: "\"Detox de suco verde por dias é o que limpa o corpo.\"",
+      texto:
+        "Mito. Quem 'desintoxica' o corpo são o fígado e os rins, todos os dias — eles não precisam de jejum de suco. O que ajuda é parar de sobrecarregá-los com o que inflama e dar comida de verdade, com fibra e água. Este protocolo não é jejum: você come três refeições completas.",
+    },
+    {
+      nome: "\"Pular refeição acelera o resultado.\"",
+      texto:
+        "Mito. Pular refeição costuma gerar fome descontrolada depois, queda de energia e perda de massa muscular. O corpo desincha melhor com refeições equilibradas e intervalos — não com privação. Comer bem é o que reeduca o metabolismo.",
+    },
+    {
+      nome: "\"Se não emagreci na balança, não funcionou.\"",
+      texto:
+        "Mito. A balança mede água, músculo, intestino e gordura tudo junto — é a pior medida nos primeiros dias. Olhe o rosto, os anéis, o caimento da roupa, a energia e o sono. O resultado real do protocolo é o corpo destravar; o número segue depois.",
+    },
+  ],
+
   faq: [
     {
       q: "Posso tomar café durante o protocolo?",
@@ -1142,6 +1235,7 @@ const es: ProtocoloContent = {
   secRitual: "Bono secreto · Ritual de Drenaje",
   secEsperar: "Lo que puedes esperar en cada fase",
   secErros: "Errores que traban el protocolo",
+  secMitos: "Mitos y verdades",
   secFaq: "Preguntas que toda mujer hace",
   secFinal: "Palabra final",
   diaLabel: "Día",
@@ -1151,6 +1245,8 @@ const es: ProtocoloContent = {
   lblSubstituicoes: "Sustituciones",
   lblAoAcordar: "Al despertar",
   lblHidratacao: "Hidratación y movimiento",
+  lblCiencia: "Lo que pasa en tu cuerpo hoy",
+  lblSnacks: "Si te da hambre: snacks permitidos",
   lblPorque: "Por qué funciona",
   lblDicaBeatriz: "Consejo de Beatriz",
 
@@ -1319,6 +1415,13 @@ const es: ProtocoloContent = {
       ],
       hidratacao:
         "Toma al menos 2 litros de agua a lo largo del día. Si puedes, haz una caminata suave de 15 minutos — no para quemar, sino para activar la circulación y ayudar al cuerpo a abrir las compuertas.",
+      ciencia:
+        "Hoy el cuerpo recibe el primer choque de información nueva: menos sodio, menos azúcar, menos aceite refinado. En las primeras 24 horas todavía está 'reteniendo' líquido por costumbre, así que no esperes el deshinchamiento ahora — espera el cambio de switch. El jengibre y la cúrcuma del Agua del Jordán empiezan a bajar los marcadores de inflamación, y la fibra de la avena y las verduras comienza a alimentar el intestino. El hambre leve que sientes es el cuerpo buscando el azúcar de siempre y no encontrándolo. Es normal y pasa.",
+      snacks: [
+        "1 fruta (manzana, pera o un puñado de uvas) con 3 nueces",
+        "1 zanahoria o pepino en palitos con un hilo de aceite y limón",
+        "1 taza de té de jengibre con hierbabuena, sin azúcar",
+      ],
     },
     {
       numero: 2,
@@ -1396,6 +1499,13 @@ const es: ProtocoloContent = {
       ],
       hidratacao:
         "2 litros de agua. Si te dan ganas de algo dulce (y las tendrás, hoy), no pelees — come una fruta o un dátil. Sustituir es más inteligente que resistir.",
+      ciencia:
+        "El leve dolor de cabeza y el antojo de dulce de hoy tienen nombre: abstinencia. Tu cerebro estaba acostumbrado a dosis regulares de azúcar y sodio, que activan los mismos circuitos de recompensa que una sustancia adictiva. Al cortarlas, protesta por 24 a 48 horas — es el pico de la incomodidad y también la señal más clara de que está funcionando. Los riñones, ahora con menos sodio, empiezan a liberar el líquido retenido: por eso vas más al baño. La chía y el yogur de hoy estabilizan el azúcar en sangre y sostienen el hambre.",
+      snacks: [
+        "1 yogur natural entero con canela",
+        "1 dátil o 2 ciruelas pasas (calma el antojo de dulce al instante)",
+        "1 puñado de frutos rojos congelados",
+      ],
     },
     {
       numero: 3,
@@ -1475,6 +1585,13 @@ const es: ProtocoloContent = {
       ],
       hidratacao:
         "De 2 a 2,5 litros de agua hoy — es día de drenaje, el cuerpo necesita líquido limpio para soltar el retenido. Una caminata suave de 20 minutos, si es posible, ayuda mucho hoy.",
+      ciencia:
+        "Hoy es el pico del drenaje. Con el sodio bajo desde hace dos días, el cuerpo por fin invierte el switch hormonal que retenía agua (la aldosterona cede) y empieza a eliminar el líquido acumulado de verdad. Por eso el Ritual de Drenaje de la noche cae justo aquí: el calor del baño de pies dilata los vasos y el automasaje empuja la linfa de abajo hacia arriba, sumándose al trabajo que el cuerpo ya hace por dentro. La vitamina verde de la mañana entrega clorofila, magnesio y potasio — el trío que equilibra el sodio y deshincha. Tomar bastante agua hoy no es contradictorio: es lo que le da al cuerpo permiso para soltar el resto.",
+      snacks: [
+        "1 vaso de agua de coco natural (repone potasio)",
+        "Palitos de pepino y apio con homus",
+        "1 naranja o mandarina",
+      ],
     },
     {
       numero: 4,
@@ -1551,6 +1668,13 @@ const es: ProtocoloContent = {
       ],
       hidratacao:
         "Mantén los 2 litros. Repara cómo la sed es diferente cuando el cuerpo está hidratado de verdad — deja de almacenar agua.",
+      ciencia:
+        "Después del pico de ayer, hoy el cuerpo se reorganiza en el nuevo equilibrio — y por eso la mañana del Día 4 trae la primera gran sorpresa en el espejo. La inflamación bajó lo suficiente para que el rostro se afine y los ojos se deshinchen. La energía sube porque el azúcar en sangre dejó de hacer montaña rusa: sin los picos y caídas, el cuerpo tiene combustible estable todo el día. Muchas mujeres relatan dormir la noche entera por primera vez en meses — mejor sueño es consecuencia directa de menos inflamación y azúcar estable. La lenteja y el huevo de hoy sostienen esa energía con proteína de verdad.",
+      snacks: [
+        "1 huevo cocido con una pizca de sal y pimienta",
+        "1 puñado de almendras o nueces",
+        "Rodajas de manzana con canela",
+      ],
     },
     {
       numero: 5,
@@ -1627,6 +1751,13 @@ const es: ProtocoloContent = {
       ],
       hidratacao:
         "Mantén los 2 litros de agua. Hoy, pruébate aquella ropa que estaba apretada al inicio de la semana — solo para sentir, en el cuerpo, lo que está pasando.",
+      ciencia:
+        "A estas alturas la inflamación ha cedido bastante y el cuerpo entró en ritmo de crucero. El paladar ya empezó a reeducarse: alimentos que parecían 'sin gracia' el Día 1 ahora tienen sabor, porque tus receptores ya no están saturados de azúcar y sodio. Por eso el menú de hoy puede ser más generoso sin culpa — un cuerpo que responde merece ser nutrido, no castigado. La crepioca y el garbanzo traen proteína y fibra que mantienen la saciedad larga. Comer lo suficiente es lo que evita el efecto rebote: la privación genera compensación, el equilibrio genera constancia.",
+      snacks: [
+        "Crepioca pequeña con queso blanco",
+        "1 puñado de garbanzo crocante asado",
+        "1 fruta de temporada con mantequilla de maní",
+      ],
     },
     {
       numero: 6,
@@ -1709,6 +1840,13 @@ const es: ProtocoloContent = {
       ],
       hidratacao:
         "2 litros de agua. Hoy, separa mentalmente (o anota) tres recetas del Método Alimentación Bíblica que harás la próxima semana. La transición comienza en la cabeza antes de comenzar en la cocina.",
+      ciencia:
+        "Lo que pasó en seis días no fue solo deshinchamiento: reprogramaste hábitos. El cerebro forma una rutina nueva en una o dos semanas de repetición, y ya estás a mitad de camino. Las bacterias del intestino también cambiaron — alimentadas con fibra de verdad en vez de azúcar, la población que reduce la inflamación creció, y eso se siente en mejor digestión y menos gases. El curry de hoy trae cúrcuma con grasa buena de la leche de coco y una pizca de pimienta: la combinación exacta que multiplica la absorción de la curcumina antiinflamatoria. Hoy el cuerpo ya sabe el camino — solo falta que decidas seguir en él.",
+      snacks: [
+        "1 taza de sopa de verduras de la cena (haz de más)",
+        "1 puñado de semillas de ahuyama o girasol",
+        "1 banano con canela",
+      ],
     },
     {
       numero: 7,
@@ -1789,6 +1927,13 @@ const es: ProtocoloContent = {
       ],
       hidratacao:
         "Mantén la hidratación. Y hoy, antes de dormir, haz una oración de gratitud por el cuerpo que respondió. Mañana empieza la vida nueva — directo al Método Alimentación Bíblica.",
+      ciencia:
+        "En el séptimo día, lo que sientes no es solo ligereza física — es la prueba de un principio: el cuerpo fue diseñado para sanar cuando dejas de estorbarle. En una semana, los marcadores de inflamación bajaron, el líquido retenido salió, el azúcar en sangre se estabilizó, el sueño mejoró y el paladar se reeducó. Nada de eso fue magia ni privación: fue comida de verdad, agua y descanso, en el orden correcto. El salmón de hoy cierra la semana con la mayor dosis de omega-3 del protocolo. A partir de mañana, el secreto es solo no volver atrás — y el Método Alimentación Bíblica es el camino para mantener, para siempre, lo que destrabaste en siete días.",
+      snacks: [
+        "Bowl pequeño de yogur con frutas y miel",
+        "1 puñado de nueces o almendras",
+        "Higos frescos o secos con un hilo de miel",
+      ],
     },
   ],
 
@@ -2041,6 +2186,39 @@ const es: ProtocoloContent = {
       nome: "Abandonar en el Día 2",
       texto:
         "El Día 2 suele ser el más difícil. Quien atraviesa el Día 2 llega al Día 4 y ve el resultado. Aguanta firme — es solo un día.",
+    },
+  ],
+
+  mitos: [
+    {
+      nome: "\"Comer grasa engorda e inflama.\"",
+      texto:
+        "Mito. La grasa buena — aceite de oliva, aguacate, frutos secos, omega-3 del pescado — es justamente antiinflamatoria y da saciedad. Lo que inflama son los aceites vegetales refinados (soya, maíz, canola) y la grasa escondida en los ultraprocesados. No le temas al hilo de aceite crudo: es remedio.",
+    },
+    {
+      nome: "\"La fruta tiene mucha azúcar, mejor cortarla.\"",
+      texto:
+        "Mito. El azúcar de la fruta viene envuelto en fibra, agua y antioxidantes, así que entra despacio en la sangre — nada que ver con el azúcar refinada pura. La fruta entera está permitida e incentivada. El cuidado es solo con el jugo colado en exceso, que pierde la fibra.",
+    },
+    {
+      nome: "\"La hinchazón es solo grasa, basta comer menos.\"",
+      texto:
+        "Mito. Buena parte de lo que llamas 'grasa' en el rostro, las manos y la barriga es líquido retenido por la inflamación y el exceso de sodio. Por eso el deshinchamiento aparece en pocos días al cortar el ultraprocesado y tomar más agua — demasiado rápido para ser grasa de verdad.",
+    },
+    {
+      nome: "\"El detox de jugo verde por días es lo que limpia el cuerpo.\"",
+      texto:
+        "Mito. Quienes 'desintoxican' el cuerpo son el hígado y los riñones, todos los días — no necesitan ayuno de jugo. Lo que ayuda es dejar de sobrecargarlos con lo que inflama y dar comida de verdad, con fibra y agua. Este protocolo no es ayuno: comes tres comidas completas.",
+    },
+    {
+      nome: "\"Saltarse una comida acelera el resultado.\"",
+      texto:
+        "Mito. Saltarse comidas suele generar hambre descontrolada después, caída de energía y pérdida de masa muscular. El cuerpo deshincha mejor con comidas equilibradas e intervalos — no con privación. Comer bien es lo que reeduca el metabolismo.",
+    },
+    {
+      nome: "\"Si no adelgacé en la balanza, no funcionó.\"",
+      texto:
+        "Mito. La balanza mide agua, músculo, intestino y grasa todo junto — es la peor medida en los primeros días. Mira el rostro, los anillos, cómo cae la ropa, la energía y el sueño. El resultado real del protocolo es que el cuerpo se destrabe; el número viene después.",
     },
   ],
 

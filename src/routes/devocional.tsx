@@ -38,9 +38,13 @@ function DevocionalPage() {
 
       <section className="mx-6 mt-6 rounded-3xl bg-card p-6 shadow-card">
         <EdI18n as="h2" k="dev_reflection" className="block font-serif text-xl text-foreground" />
-        <p className="mt-3 text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
-          {v.reflexao}
-        </p>
+        <div className="mt-3 space-y-3">
+          {v.reflexao.map((p, i) => (
+            <p key={i} className="text-sm leading-relaxed text-muted-foreground">
+              {p}
+            </p>
+          ))}
+        </div>
       </section>
 
       <section className="mx-6 mt-4 mb-6 rounded-3xl bg-highlight p-6 shadow-card">

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ElementType } from "react";
 import { createPortal } from "react-dom";
 import { Pencil, ImageUp, X, Check, RotateCcw } from "lucide-react";
-import { useLang } from "@/lib/store";
+import { useLang, useImagesReady } from "@/lib/store";
 import { T, type TKey } from "@/lib/i18n";
 import {
   useEditMode,
@@ -159,6 +159,7 @@ export function EditImage({
   loading?: "lazy" | "eager";
 }) {
   const edit = useEditMode();
+  const ready = useImagesReady();
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   // Resolve the cloud/IDB photo for this id (so every user sees uploads),
@@ -195,6 +196,11 @@ export function EditImage({
   const shown = resolved;
 
   if (!edit) {
+    // Hold back the <img> until the image cache (IDB + cloud) is hydrated, so
+    // the bundled stock fallback doesn't flash before the real photo swaps in.
+    if (!ready) {
+      return <span className={`${className ?? ""} block animate-pulse bg-highlight/60`} aria-label={alt} role="img" />;
+    }
     return <img src={shown} alt={alt} className={className} loading={loading} />;
   }
 

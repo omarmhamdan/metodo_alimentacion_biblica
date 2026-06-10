@@ -84,7 +84,7 @@ export async function uploadRecipePhoto(recipeId: string, dataUrl: string): Prom
     .upload(path, blob, { upsert: true, contentType: blob.type, cacheControl: "3600" });
   if (upErr) {
     console.warn("[Sync] photo upload failed", upErr.message);
-    return null;
+    throw new Error(`Falha ao enviar a foto para o Storage do Supabase: ${upErr.message}`);
   }
   const { data: pub } = supabase.storage.from(PHOTOS_BUCKET).getPublicUrl(path);
   const url = pub.publicUrl;

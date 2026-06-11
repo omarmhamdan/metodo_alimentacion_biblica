@@ -118,8 +118,7 @@ const BOOTSTRAP_PWA_META = `
   try {
     var lang = localStorage.getItem('mab:lang');
     if (lang !== 'pt' && lang !== 'es') {
-      var bl = (navigator.language || '').toLowerCase();
-      lang = bl.indexOf('pt') === 0 ? 'pt' : 'es';
+      lang = 'es'; // first visit defaults to Spanish (primary audience)
     }
     var title = lang === 'pt' ? 'Método Alimentação Bíblica' : 'Método Alimentación Bíblica';
     document.documentElement.lang = lang;

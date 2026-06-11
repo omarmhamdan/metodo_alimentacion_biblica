@@ -6,9 +6,8 @@ export function getLang(): Lang {
   if (typeof window === "undefined") return "es";
   const stored = localStorage.getItem(KEY) as Lang | null;
   if (stored === "es" || stored === "pt") return stored;
-  // First visit: pick lang from the browser locale (pt-BR → pt, otherwise es)
-  const browserLang = (navigator.language || "").toLowerCase();
-  return browserLang.startsWith("pt") ? "pt" : "es";
+  // First visit: default to Spanish (primary audience). User can switch to PT.
+  return "es";
 }
 
 export function setLang(l: Lang) {

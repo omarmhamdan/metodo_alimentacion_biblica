@@ -54,13 +54,14 @@ import { recipes } from "@/lib/recipes";
 import { recipeTranslationsES } from "@/lib/recipes-es";
 import { bonusSlots } from "@/lib/bonus-images";
 import { setEditMode } from "@/lib/edit-store";
+import { setEntitlement, PRODUTOS, type Produto } from "@/lib/entitlements";
 
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
   // title set by AppShell bootstrap (per-language)
 });
 
-type Tab = "dashboard" | "receitas" | "bonus" | "conteudo" | "usuarios" | "exportar";
+type Tab = "dashboard" | "receitas" | "bonus" | "conteudo" | "acessos" | "usuarios" | "exportar";
 
 function AdminPage() {
   const navigate = useNavigate();
@@ -294,6 +295,7 @@ function AdminPage() {
     { id: "receitas", label: "Receitas", icon: ChefHat },
     { id: "bonus", label: "Bônus", icon: Sparkles },
     { id: "conteudo", label: "Conteúdo", icon: FileText },
+    { id: "acessos", label: "Acessos", icon: Lock },
     { id: "usuarios", label: "Usuários", icon: Users },
     { id: "exportar", label: "Exportar", icon: Download },
   ];
@@ -679,6 +681,9 @@ function AdminPage() {
           </div>
         )}
 
+        {/* ── ACESSOS (liberação manual dos upsells por email) ── */}
+        {tab === "acessos" && <AccessPanel />}
+
         {/* ── USUÁRIOS ── */}
         {tab === "usuarios" && (
           <div className="space-y-6">
@@ -893,6 +898,112 @@ function QuickAction({
     >
       <Icon className="h-5 w-5 text-olive" /> {label}
     </button>
+  );
+}
+
+function AccessPanel() {
+  const [email, setEmail] = useState("");
+  const [sel, setSel] = useState<Record<Produto, boolean>>({
+    "anti-inflamacao": false,
+    "mesa-unica": false,
+  });
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+
+  const apply = async (active: boolean) => {
+    const chosen = PRODUTOS.filter((p) => sel[p.id]).map((p) => p.id);
+    if (!email.trim() || chosen.length === 0) {
+      setMsg({ ok: false, text: "Informe o email e marque ao menos um produto." });
+      return;
+    }
+    setBusy(true);
+    setMsg(null);
+    const results = await Promise.all(chosen.map((p) => setEntitlement(email, p, active)));
+    setBusy(false);
+    const fail = results.find((r) => !r.ok);
+    if (fail) setMsg({ ok: false, text: fail.error ?? "Falha ao salvar." });
+    else
+      setMsg({
+        ok: true,
+        text: `${active ? "Liberado" : "Revogado"} para ${email.trim().toLowerCase()}: ${chosen
+          .map((c) => PRODUTOS.find((p) => p.id === c)?.pt)
+          .join(", ")}.`,
+      });
+  };
+
+  return (
+    <div className="space-y-5">
+      <div>
+        <h2 className="text-xl font-semibold">Acessos dos Bônus</h2>
+        <p className="mt-1 text-sm text-stone-400">
+          Libere ou revogue manualmente o acesso aos upsells por email. (O webhook da Hotmart fará
+          isso automaticamente numa próxima fase.)
+        </p>
+      </div>
+
+      {!supabaseEnabled && (
+        <div className="flex items-start gap-3 rounded-2xl border border-amber-500/20 bg-amber-500/10 p-4">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
+          <p className="text-xs text-amber-400/90">
+            Supabase não configurado neste ambiente — a liberação só funciona em produção (com
+            Supabase), onde a tabela <code>entitlements</code> existe.
+          </p>
+        </div>
+      )}
+
+      <div className="space-y-3 rounded-2xl border border-stone-700 bg-stone-800/40 p-4">
+        <label className="block text-xs font-medium text-stone-400">Email do comprador</label>
+        <input
+          type="email"
+          inputMode="email"
+          autoCapitalize="none"
+          value={email}
+          onChange={(e) => setEmail(e.target.value.toLowerCase())}
+          placeholder="comprador@email.com"
+          className="w-full rounded-xl border border-stone-600 bg-stone-900 px-3 py-2.5 text-sm text-white outline-none focus:border-olive"
+        />
+        <div className="flex flex-wrap gap-2 pt-1">
+          {PRODUTOS.map((p) => (
+            <button
+              key={p.id}
+              onClick={() => setSel((s) => ({ ...s, [p.id]: !s[p.id] }))}
+              className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+                sel[p.id]
+                  ? "bg-olive text-cream"
+                  : "border border-stone-600 text-stone-300 hover:text-white"
+              }`}
+            >
+              {sel[p.id] ? "✓ " : ""}
+              {p.pt}
+            </button>
+          ))}
+        </div>
+        <div className="flex gap-2 pt-1">
+          <button
+            onClick={() => apply(true)}
+            disabled={busy}
+            className="flex-1 rounded-xl bg-olive py-2.5 text-sm font-medium text-cream disabled:opacity-60"
+          >
+            Liberar acesso
+          </button>
+          <button
+            onClick={() => apply(false)}
+            disabled={busy}
+            className="rounded-xl border border-stone-600 px-4 py-2.5 text-sm text-stone-300 hover:text-white disabled:opacity-60"
+          >
+            Revogar
+          </button>
+        </div>
+        {msg && (
+          <p
+            className={`rounded-xl p-3 text-xs ${msg.ok ? "bg-olive/20 text-olive" : "bg-red-500/10 text-red-300"}`}
+          >
+            {msg.ok ? "✓ " : "⚠️ "}
+            {msg.text}
+          </p>
+        )}
+      </div>
+    </div>
   );
 }
 

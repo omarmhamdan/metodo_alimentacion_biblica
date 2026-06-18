@@ -25,6 +25,7 @@ import { useLang, useStoredImageMap } from "@/lib/store";
 import { protocoloContent, type Refeicao, type Dia, type ProtocoloContent } from "@/lib/protocolo";
 import { bonusFallbacks } from "@/lib/bonus-images";
 import { Ed, EditImage } from "@/components/Editable";
+import { Locked } from "@/components/Locked";
 
 const PT = protocoloContent.pt;
 const ES = protocoloContent.es;
@@ -47,20 +48,22 @@ function Protocolo() {
 
   return (
     <AppShell>
-      <AnimatePresence mode="wait">
-        {dia ? (
-          <DayDetail
-            key={`d${dia.numero}`}
-            dia={dia}
-            c={c}
-            onBack={() => setSel(null)}
-            onNav={setSel}
-            total={c.dias.length}
-          />
-        ) : (
-          <Landing key="landing" c={c} onPick={setSel} lang={lang} />
-        )}
-      </AnimatePresence>
+      <Locked product="anti-inflamacao">
+        <AnimatePresence mode="wait">
+          {dia ? (
+            <DayDetail
+              key={`d${dia.numero}`}
+              dia={dia}
+              c={c}
+              onBack={() => setSel(null)}
+              onNav={setSel}
+              total={c.dias.length}
+            />
+          ) : (
+            <Landing key="landing" c={c} onPick={setSel} lang={lang} />
+          )}
+        </AnimatePresence>
+      </Locked>
     </AppShell>
   );
 }

@@ -24,6 +24,7 @@ import { useLang, useStoredImageMap } from "@/lib/store";
 import { mesaContent, type Categoria, type MesaContent } from "@/lib/mesa-unica";
 import { bonusFallbacks } from "@/lib/bonus-images";
 import { Ed, EditImage } from "@/components/Editable";
+import { Locked } from "@/components/Locked";
 
 const PT = mesaContent.pt;
 const ES = mesaContent.es;
@@ -40,13 +41,15 @@ function MesaUnica() {
 
   return (
     <AppShell>
-      <AnimatePresence mode="wait">
-        {categoria ? (
-          <CategoryDetail key={categoria.id} cat={categoria} c={c} onBack={() => setCat(null)} />
-        ) : (
-          <Landing key="landing" c={c} onPick={setCat} lang={lang} />
-        )}
-      </AnimatePresence>
+      <Locked product="mesa-unica">
+        <AnimatePresence mode="wait">
+          {categoria ? (
+            <CategoryDetail key={categoria.id} cat={categoria} c={c} onBack={() => setCat(null)} />
+          ) : (
+            <Landing key="landing" c={c} onPick={setCat} lang={lang} />
+          )}
+        </AnimatePresence>
+      </Locked>
     </AppShell>
   );
 }

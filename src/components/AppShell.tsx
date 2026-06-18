@@ -3,8 +3,9 @@ import { BottomNav } from "./BottomNav";
 import { SideNav } from "./SideNav";
 import { InstallPrompt, InstallBanner } from "./InstallPrompt";
 import { EditModeBar } from "./Editable";
-import { useLang } from "@/lib/store";
+import { useLang, useUser } from "@/lib/store";
 import { initTextOverrides } from "@/lib/edit-store";
+import { initEntitlements } from "@/lib/entitlements";
 
 /**
  * Responsive strategy:
@@ -17,6 +18,7 @@ import { initTextOverrides } from "@/lib/edit-store";
  */
 export function AppShell({ children, hideNav }: { children: ReactNode; hideNav?: boolean }) {
   const { lang, setLang } = useLang();
+  const { user } = useUser();
   const [forceInstall, setForceInstall] = useState(false);
   const [isWide, setIsWide] = useState(false);
 
@@ -32,6 +34,11 @@ export function AppShell({ children, hideNav }: { children: ReactNode; hideNav?:
   useEffect(() => {
     initTextOverrides();
   }, []);
+
+  // Load purchase entitlements for the logged-in email (per-product paywall)
+  useEffect(() => {
+    initEntitlements(user?.email);
+  }, [user?.email]);
 
   // PWA: serve the per-language manifest + update the iOS "Add to Home Screen" name
   useEffect(() => {

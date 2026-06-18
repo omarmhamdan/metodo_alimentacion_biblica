@@ -54,7 +54,12 @@ import { recipes } from "@/lib/recipes";
 import { recipeTranslationsES } from "@/lib/recipes-es";
 import { bonusSlots } from "@/lib/bonus-images";
 import { setEditMode } from "@/lib/edit-store";
-import { setEntitlement, PRODUTOS, type Produto } from "@/lib/entitlements";
+import {
+  setEntitlement,
+  adminFetchEntitlements,
+  PRODUTOS,
+  type Produto,
+} from "@/lib/entitlements";
 
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
@@ -87,6 +92,8 @@ function AdminPage() {
     byLang: {} as Record<string, number>,
   });
   const [cloudLoading, setCloudLoading] = useState(false);
+  // email → { product → active } (Supabase entitlements, for per-user access view)
+  const [entMap, setEntMap] = useState<Record<string, Record<Produto, boolean>>>({});
 
   const refreshCloud = useCallback(async () => {
     if (!supabaseEnabled) return;
@@ -95,10 +102,28 @@ function AdminPage() {
       const [u, s] = await Promise.all([adminListUsers(), adminStats()]);
       setCloudUsers(u);
       setCloudStats(s);
+      setEntMap(await adminFetchEntitlements(u.map((x) => x.email)));
     } finally {
       setCloudLoading(false);
     }
   }, []);
+
+  const toggleEntitlement = useCallback(
+    async (email: string, product: Produto, active: boolean) => {
+      const r = await setEntitlement(email, product, active);
+      if (!r.ok) {
+        alert(r.error ?? "Falha ao salvar acesso.");
+        return;
+      }
+      // Optimistic local update so the badge flips instantly.
+      const key = email.trim().toLowerCase();
+      setEntMap((prev) => {
+        const base = prev[key] ?? { "anti-inflamacao": false, "mesa-unica": false };
+        return { ...prev, [key]: { ...base, [product]: active } };
+      });
+    },
+    [],
+  );
 
   useEffect(() => {
     if (loggedIn) refreshCloud();
@@ -732,6 +757,10 @@ function AdminPage() {
                         key={u.email}
                         u={u}
                         recipesMap={Object.fromEntries(recipes.map((r) => [r.id, r.titulo]))}
+                        ent={entMap[u.email.trim().toLowerCase()]}
+                        onToggle={(product, active) =>
+                          toggleEntitlement(u.email, product, active)
+                        }
                         onDelete={async () => {
                           if (
                             !confirm(`Apagar usuário ${u.email}? Esta ação não pode ser desfeita.`)
@@ -1356,10 +1385,14 @@ function MiniStat({ label, value }: { label: string; value: string }) {
 function CloudUserRow({
   u,
   recipesMap,
+  ent,
+  onToggle,
   onDelete,
 }: {
   u: AdminUserRow;
   recipesMap: Record<string, string>;
+  ent?: Record<Produto, boolean>;
+  onToggle: (product: Produto, active: boolean) => void | Promise<void>;
   onDelete: () => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -1399,6 +1432,33 @@ function CloudUserRow({
           <Trash2 className="h-3.5 w-3.5" />
         </button>
       </div>
+
+      {/* ── Acessos aos upsells (clique pra liberar/revogar) ── */}
+      <div className="mt-2.5 flex flex-wrap items-center gap-2 pl-12">
+        <span className="text-[10px] uppercase tracking-wider text-stone-500">Acessos:</span>
+        {PRODUTOS.map((p) => {
+          const active = ent?.[p.id] === true;
+          return (
+            <button
+              key={p.id}
+              onClick={() => {
+                if (active && !confirm(`Revogar "${p.pt}" de ${u.email}?`)) return;
+                onToggle(p.id, !active);
+              }}
+              title={active ? "Comprado — clique pra revogar" : "Bloqueado — clique pra liberar"}
+              className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                active
+                  ? "bg-green-500/20 text-green-400 hover:bg-green-500/30"
+                  : "border border-stone-700 text-stone-500 hover:text-stone-300"
+              }`}
+            >
+              {active ? <Check className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
+              {p.pt}
+            </button>
+          );
+        })}
+      </div>
+
       {open && (
         <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
           <MiniStat label="Cadastro" value={new Date(u.created_at).toLocaleDateString("pt-BR")} />

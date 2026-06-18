@@ -17,10 +17,10 @@ export const PRODUTOS: { id: Produto; pt: string; es: string }[] = [
   { id: "mesa-unica", pt: "Guia Mesa Única", es: "Guía Mesa Única" },
 ];
 
-// Links de checkout da Hotmart (preencher quando tiver). Vazio → botão avisa "em breve".
+// Links de checkout da Hotmart.
 export const CHECKOUT_URLS: Record<Produto, string> = {
-  "anti-inflamacao": "",
-  "mesa-unica": "",
+  "anti-inflamacao": "https://pay.hotmart.com/A106251023T",
+  "mesa-unica": "https://pay.hotmart.com/I106251089R",
 };
 
 const LS_KEY = "mab:entitlements"; // Record<Produto, boolean> resolvido neste dispositivo
@@ -144,6 +144,33 @@ export async function setEntitlement(
     return { ok: true };
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : String(err) };
+  }
+}
+
+/** Admin: fetch entitlement state (active per product) for a set of emails. */
+export async function adminFetchEntitlements(
+  emails: string[],
+): Promise<Record<string, Record<Produto, boolean>>> {
+  const out: Record<string, Record<Produto, boolean>> = {};
+  if (!supabase || emails.length === 0) return out;
+  const norms = Array.from(new Set(emails.map(norm).filter(Boolean)));
+  if (norms.length === 0) return out;
+  try {
+    const { data, error } = await supabase
+      .from("entitlements")
+      .select("email, product, active")
+      .in("email", norms);
+    if (error || !data) return out;
+    for (const row of data as { email: string; product: string; active: boolean }[]) {
+      const e = norm(row.email);
+      if (!out[e]) out[e] = { "anti-inflamacao": false, "mesa-unica": false };
+      if (row.product === "anti-inflamacao" || row.product === "mesa-unica") {
+        out[e][row.product as Produto] = row.active;
+      }
+    }
+    return out;
+  } catch {
+    return out;
   }
 }
 

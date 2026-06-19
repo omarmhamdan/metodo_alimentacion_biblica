@@ -1,10 +1,12 @@
 // Entitlements — controla acesso pago por produto (upsell).
-// Fonte de verdade: tabela Supabase `entitlements(email, product, active)`.
-// Liberação manual hoje (admin); webhook Hotmart numa 2ª fase grava na mesma tabela.
+// Fonte de verdade: tabela Supabase `entitlements(email, product, active, restored_from)`.
+// Grava: webhook Hotmart (compra/reembolso), admin (manual) e "Já comprei"
+// (restore-link via /api/restore, que copia o acesso do email da compra para o
+// email de login — desbloqueio permanente e cross-device).
 //
 // Identidade: o acesso é resolvido para o email do usuário logado + quaisquer
-// emails "restaurados" no dispositivo (botão "Já comprei"). Cache local espelha
-// o estado pra funcionar offline e sem flash.
+// emails "restaurados" no dispositivo. Cache local espelha o estado pra funcionar
+// offline e sem flash.
 
 import { useEffect, useState } from "react";
 import { supabase } from "./supabase";
@@ -91,13 +93,41 @@ export async function initEntitlements(loginEmail?: string): Promise<void> {
   await pullFromCloud(_emails);
 }
 
+/** Wipe entitlement cache + tracked emails (call on logout — prevents access
+ * leaking to the next user on a shared device; re-login refetches from the DB). */
+export function clearEntitlements(): void {
+  _access = {};
+  _emails = [];
+  if (typeof window !== "undefined") {
+    localStorage.removeItem(LS_KEY);
+    localStorage.removeItem(LS_EMAILS);
+  }
+  emit();
+}
+
 /** True if the product is unlocked (admin bypass, else entitlement). */
 export function hasAccess(product: Produto): boolean {
   if (isAdminLoggedIn()) return true;
   return _access[product] === true;
 }
 
-/** Restore a purchase by typing the email used at checkout. Returns granted products. */
+/** Current login email (from local profile), used to make a restore permanent. */
+function loginEmail(): string {
+  if (typeof window === "undefined") return "";
+  try {
+    const u = JSON.parse(localStorage.getItem("mab:user") ?? "null") as { email?: string } | null;
+    return norm(u?.email);
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * Restore a purchase by typing the email used at checkout. Returns granted products.
+ * Calls /api/restore so the unlock is LINKED to the login email (permanent +
+ * cross-device + visible in admin). Falls back to a direct read if the endpoint
+ * isn't reachable (e.g. local dev without the Worker).
+ */
 export async function restoreByEmail(email: string): Promise<Produto[]> {
   const e = norm(email);
   if (!e) return [];
@@ -105,27 +135,44 @@ export async function restoreByEmail(email: string): Promise<Produto[]> {
     _emails.push(e);
     writeLS(LS_EMAILS, _emails);
   }
-  if (!supabase) return [];
+
+  let granted: Produto[] = [];
   try {
-    const { data, error } = await supabase
-      .from("entitlements")
-      .select("product, active")
-      .eq("email", e)
-      .eq("active", true);
-    if (error || !data) return [];
-    const granted: Produto[] = [];
-    for (const row of data as { product: string; active: boolean }[]) {
-      if (row.active) {
-        _access[row.product] = true;
-        granted.push(row.product as Produto);
-      }
+    const res = await fetch("/api/restore", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ loginEmail: loginEmail(), purchaseEmail: e }),
+    });
+    if (res.ok) {
+      const data = (await res.json()) as { granted?: string[] };
+      granted = (data.granted ?? []).filter(
+        (p): p is Produto => p === "anti-inflamacao" || p === "mesa-unica",
+      );
     }
-    writeLS(LS_KEY, _access);
-    emit();
-    return granted;
   } catch {
-    return [];
+    /* fall through to direct read */
   }
+
+  // Fallback: direct read (device-local only) if the endpoint gave nothing.
+  if (granted.length === 0 && supabase) {
+    try {
+      const { data } = await supabase
+        .from("entitlements")
+        .select("product, active")
+        .eq("email", e)
+        .eq("active", true);
+      granted = ((data ?? []) as { product: string; active: boolean }[])
+        .filter((r) => r.active)
+        .map((r) => r.product as Produto);
+    } catch {
+      /* offline */
+    }
+  }
+
+  for (const p of granted) _access[p] = true;
+  writeLS(LS_KEY, _access);
+  emit();
+  return granted;
 }
 
 /** Admin: grant/revoke a product for an email (writes to Supabase). */
@@ -154,25 +201,32 @@ export async function setEntitlement(
   }
 }
 
-/** Admin: fetch entitlement state (active per product) for a set of emails. */
+export type EntState = { active: boolean; restoredFrom: string | null };
+
+/** Admin: fetch entitlement state per product (active + purchase email) for a set of emails. */
 export async function adminFetchEntitlements(
   emails: string[],
-): Promise<Record<string, Record<Produto, boolean>>> {
-  const out: Record<string, Record<Produto, boolean>> = {};
+): Promise<Record<string, Partial<Record<Produto, EntState>>>> {
+  const out: Record<string, Partial<Record<Produto, EntState>>> = {};
   if (!supabase || emails.length === 0) return out;
   const norms = Array.from(new Set(emails.map(norm).filter(Boolean)));
   if (norms.length === 0) return out;
   try {
     const { data, error } = await supabase
       .from("entitlements")
-      .select("email, product, active")
+      .select("email, product, active, restored_from")
       .in("email", norms);
     if (error || !data) return out;
-    for (const row of data as { email: string; product: string; active: boolean }[]) {
+    for (const row of data as {
+      email: string;
+      product: string;
+      active: boolean;
+      restored_from: string | null;
+    }[]) {
       const e = norm(row.email);
-      if (!out[e]) out[e] = { "anti-inflamacao": false, "mesa-unica": false };
+      if (!out[e]) out[e] = {};
       if (row.product === "anti-inflamacao" || row.product === "mesa-unica") {
-        out[e][row.product as Produto] = row.active;
+        out[e][row.product as Produto] = { active: row.active, restoredFrom: row.restored_from };
       }
     }
     return out;
@@ -186,6 +240,7 @@ export type EntitlementRow = {
   product: string;
   active: boolean;
   source: string | null;
+  restored_from: string | null;
   updated_at: string;
 };
 
@@ -194,7 +249,7 @@ export async function adminListAllEntitlements(): Promise<EntitlementRow[]> {
   if (!supabase) return [];
   const { data, error } = await supabase
     .from("entitlements")
-    .select("email, product, active, source, updated_at")
+    .select("email, product, active, source, restored_from, updated_at")
     .order("updated_at", { ascending: false });
   if (error || !data) return [];
   return data as EntitlementRow[];
@@ -222,6 +277,13 @@ export async function adminListWebhookLogs(limit = 50): Promise<WebhookLogRow[]>
     .limit(limit);
   if (error || !data) return [];
   return data as WebhookLogRow[];
+}
+
+/** Admin: delete one webhook log row. */
+export async function adminDeleteWebhookLog(id: number): Promise<boolean> {
+  if (!supabase) return false;
+  const { error } = await supabase.from("webhook_logs").delete().eq("id", id);
+  return !error;
 }
 
 /** Reactive access check for a product. */

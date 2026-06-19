@@ -59,8 +59,10 @@ import {
   adminFetchEntitlements,
   adminListAllEntitlements,
   adminListWebhookLogs,
+  adminDeleteWebhookLog,
   PRODUTOS,
   type Produto,
+  type EntState,
   type EntitlementRow,
   type WebhookLogRow,
 } from "@/lib/entitlements";
@@ -70,15 +72,7 @@ export const Route = createFileRoute("/admin")({
   // title set by AppShell bootstrap (per-language)
 });
 
-type Tab =
-  | "dashboard"
-  | "receitas"
-  | "bonus"
-  | "conteudo"
-  | "acessos"
-  | "logs"
-  | "usuarios"
-  | "exportar";
+type Tab = "dashboard" | "receitas" | "bonus" | "conteudo" | "logs" | "usuarios" | "exportar";
 
 function AdminPage() {
   const navigate = useNavigate();
@@ -104,8 +98,8 @@ function AdminPage() {
     byLang: {} as Record<string, number>,
   });
   const [cloudLoading, setCloudLoading] = useState(false);
-  // email → { product → active } (Supabase entitlements, for per-user access view)
-  const [entMap, setEntMap] = useState<Record<string, Record<Produto, boolean>>>({});
+  // email → { product → {active, restoredFrom} } (Supabase entitlements, per-user view)
+  const [entMap, setEntMap] = useState<Record<string, Partial<Record<Produto, EntState>>>>({});
 
   const refreshCloud = useCallback(async () => {
     if (!supabaseEnabled) return;
@@ -130,8 +124,12 @@ function AdminPage() {
       // Optimistic local update so the badge flips instantly.
       const key = email.trim().toLowerCase();
       setEntMap((prev) => {
-        const base = prev[key] ?? { "anti-inflamacao": false, "mesa-unica": false };
-        return { ...prev, [key]: { ...base, [product]: active } };
+        const base = prev[key] ?? {};
+        const prevState = base[product];
+        return {
+          ...prev,
+          [key]: { ...base, [product]: { active, restoredFrom: prevState?.restoredFrom ?? null } },
+        };
       });
     },
     [],
@@ -249,15 +247,6 @@ function AdminPage() {
     });
   }, []);
 
-  const handleClearAll = () => {
-    if (confirm("Apagar todos os overrides e fotos? O app voltará ao conteúdo original.")) {
-      clearOverrides();
-      clearImages().then(() => setAdminImages({}));
-      setOverrides(loadOverrides());
-      setImgSizes({});
-    }
-  };
-
   const handleCopy = () => {
     navigator.clipboard.writeText(exportOverrides());
     setCopied(true);
@@ -332,7 +321,6 @@ function AdminPage() {
     { id: "receitas", label: "Receitas", icon: ChefHat },
     { id: "bonus", label: "Bônus", icon: Sparkles },
     { id: "conteudo", label: "Conteúdo", icon: FileText },
-    { id: "acessos", label: "Acessos", icon: Lock },
     { id: "logs", label: "Logs Webhook", icon: BarChart3 },
     { id: "usuarios", label: "Usuários", icon: Users },
     { id: "exportar", label: "Exportar", icon: Download },
@@ -720,8 +708,6 @@ function AdminPage() {
         )}
 
         {/* ── ACESSOS (liberação manual dos upsells por email) ── */}
-        {tab === "acessos" && <AccessPanel />}
-
         {tab === "logs" && <LogsPanel />}
 
         {/* ── USUÁRIOS ── */}
@@ -857,23 +843,6 @@ function AdminPage() {
               <pre className="max-h-80 overflow-auto rounded-xl bg-stone-950 p-4 text-xs text-stone-300">
                 {exportOverrides()}
               </pre>
-            </div>
-
-            <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-red-300">Zona de perigo</p>
-                  <p className="mt-0.5 text-xs text-red-400">
-                    Apaga todos os overrides. O app volta ao conteúdo original.
-                  </p>
-                </div>
-                <button
-                  onClick={handleClearAll}
-                  className="flex items-center gap-1.5 rounded-xl border border-red-500/40 px-3 py-2 text-xs text-red-400 hover:bg-red-500/20"
-                >
-                  <Trash2 className="h-3.5 w-3.5" /> Limpar tudo
-                </button>
-              </div>
             </div>
 
             <div className="rounded-2xl border border-stone-700 bg-stone-900 p-5">
@@ -1031,6 +1000,17 @@ function LogsPanel() {
                   <span className="text-stone-500">
                     {l.mapped_product ? prodLabel(l.mapped_product) : (l.product_name ?? l.product_id ?? "")}
                   </span>
+                  <button
+                    onClick={async () => {
+                      if (!confirm("Apagar esta linha do log?")) return;
+                      if (await adminDeleteWebhookLog(l.id)) setLogs((prev) => prev.filter((x) => x.id !== l.id));
+                      else alert("Falha ao apagar.");
+                    }}
+                    className="rounded-lg border border-red-500/30 bg-red-500/10 p-1 text-red-400 hover:bg-red-500/20"
+                    aria-label="Apagar log"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </button>
                   {l.detail && <span className="w-full text-stone-600">↳ {l.detail}</span>}
                 </div>
               ))}
@@ -1061,7 +1041,12 @@ function LogsPanel() {
                   >
                     {e.active ? "ativo" : "inativo"}
                   </span>
-                  <span className="min-w-0 flex-1 truncate text-stone-300">{e.email}</span>
+                  <span className="min-w-0 flex-1 truncate text-stone-300">
+                    {e.email}
+                    {e.restored_from && (
+                      <span className="text-stone-500"> · compra: {e.restored_from}</span>
+                    )}
+                  </span>
                   <span className="text-stone-400">{prodLabel(e.product)}</span>
                   <span className="text-stone-600">{e.source ?? "—"}</span>
                   <span className="text-stone-600">{fmt(e.updated_at)}</span>
@@ -1075,111 +1060,6 @@ function LogsPanel() {
   );
 }
 
-function AccessPanel() {
-  const [email, setEmail] = useState("");
-  const [sel, setSel] = useState<Record<Produto, boolean>>({
-    "anti-inflamacao": false,
-    "mesa-unica": false,
-  });
-  const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
-
-  const apply = async (active: boolean) => {
-    const chosen = PRODUTOS.filter((p) => sel[p.id]).map((p) => p.id);
-    if (!email.trim() || chosen.length === 0) {
-      setMsg({ ok: false, text: "Informe o email e marque ao menos um produto." });
-      return;
-    }
-    setBusy(true);
-    setMsg(null);
-    const results = await Promise.all(chosen.map((p) => setEntitlement(email, p, active)));
-    setBusy(false);
-    const fail = results.find((r) => !r.ok);
-    if (fail) setMsg({ ok: false, text: fail.error ?? "Falha ao salvar." });
-    else
-      setMsg({
-        ok: true,
-        text: `${active ? "Liberado" : "Revogado"} para ${email.trim().toLowerCase()}: ${chosen
-          .map((c) => PRODUTOS.find((p) => p.id === c)?.pt)
-          .join(", ")}.`,
-      });
-  };
-
-  return (
-    <div className="space-y-5">
-      <div>
-        <h2 className="text-xl font-semibold">Acessos dos Bônus</h2>
-        <p className="mt-1 text-sm text-stone-400">
-          Libere ou revogue manualmente o acesso aos upsells por email. (O webhook da Hotmart fará
-          isso automaticamente numa próxima fase.)
-        </p>
-      </div>
-
-      {!supabaseEnabled && (
-        <div className="flex items-start gap-3 rounded-2xl border border-amber-500/20 bg-amber-500/10 p-4">
-          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
-          <p className="text-xs text-amber-400/90">
-            Supabase não configurado neste ambiente — a liberação só funciona em produção (com
-            Supabase), onde a tabela <code>entitlements</code> existe.
-          </p>
-        </div>
-      )}
-
-      <div className="space-y-3 rounded-2xl border border-stone-700 bg-stone-800/40 p-4">
-        <label className="block text-xs font-medium text-stone-400">Email do comprador</label>
-        <input
-          type="email"
-          inputMode="email"
-          autoCapitalize="none"
-          value={email}
-          onChange={(e) => setEmail(e.target.value.toLowerCase())}
-          placeholder="comprador@email.com"
-          className="w-full rounded-xl border border-stone-600 bg-stone-900 px-3 py-2.5 text-sm text-white outline-none focus:border-olive"
-        />
-        <div className="flex flex-wrap gap-2 pt-1">
-          {PRODUTOS.map((p) => (
-            <button
-              key={p.id}
-              onClick={() => setSel((s) => ({ ...s, [p.id]: !s[p.id] }))}
-              className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-                sel[p.id]
-                  ? "bg-olive text-cream"
-                  : "border border-stone-600 text-stone-300 hover:text-white"
-              }`}
-            >
-              {sel[p.id] ? "✓ " : ""}
-              {p.pt}
-            </button>
-          ))}
-        </div>
-        <div className="flex gap-2 pt-1">
-          <button
-            onClick={() => apply(true)}
-            disabled={busy}
-            className="flex-1 rounded-xl bg-olive py-2.5 text-sm font-medium text-cream disabled:opacity-60"
-          >
-            Liberar acesso
-          </button>
-          <button
-            onClick={() => apply(false)}
-            disabled={busy}
-            className="rounded-xl border border-stone-600 px-4 py-2.5 text-sm text-stone-300 hover:text-white disabled:opacity-60"
-          >
-            Revogar
-          </button>
-        </div>
-        {msg && (
-          <p
-            className={`rounded-xl p-3 text-xs ${msg.ok ? "bg-olive/20 text-olive" : "bg-red-500/10 text-red-300"}`}
-          >
-            {msg.ok ? "✓ " : "⚠️ "}
-            {msg.text}
-          </p>
-        )}
-      </div>
-    </div>
-  );
-}
 
 function StorageBar() {
   const measure = () => {
@@ -1536,7 +1416,7 @@ function CloudUserRow({
 }: {
   u: AdminUserRow;
   recipesMap: Record<string, string>;
-  ent?: Record<Produto, boolean>;
+  ent?: Partial<Record<Produto, EntState>>;
   onToggle: (product: Produto, active: boolean) => void | Promise<void>;
   onDelete: () => void;
 }) {
@@ -1582,7 +1462,9 @@ function CloudUserRow({
       <div className="mt-2.5 flex flex-wrap items-center gap-2 pl-12">
         <span className="text-[10px] uppercase tracking-wider text-stone-500">Acessos:</span>
         {PRODUTOS.map((p) => {
-          const active = ent?.[p.id] === true;
+          const state = ent?.[p.id];
+          const active = state?.active === true;
+          const restoredFrom = state?.restoredFrom;
           return (
             <button
               key={p.id}
@@ -1590,7 +1472,13 @@ function CloudUserRow({
                 if (active && !confirm(`Revogar "${p.pt}" de ${u.email}?`)) return;
                 onToggle(p.id, !active);
               }}
-              title={active ? "Comprado — clique pra revogar" : "Bloqueado — clique pra liberar"}
+              title={
+                restoredFrom
+                  ? `Comprado com ${restoredFrom} — clique pra revogar`
+                  : active
+                    ? "Comprado — clique pra revogar"
+                    : "Bloqueado — clique pra liberar"
+              }
               className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors ${
                 active
                   ? "bg-green-500/20 text-green-400 hover:bg-green-500/30"
@@ -1599,6 +1487,11 @@ function CloudUserRow({
             >
               {active ? <Check className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
               {p.pt}
+              {active && restoredFrom && (
+                <span className="ml-1 hidden font-normal opacity-80 sm:inline">
+                  · {restoredFrom}
+                </span>
+              )}
             </button>
           );
         })}

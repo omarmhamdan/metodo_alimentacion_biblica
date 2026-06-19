@@ -78,7 +78,7 @@ const COPY = {
     restore: "Restaurar acesso",
     notFound: "Não encontramos uma compra ativa nesse email. Verifique ou aguarde alguns minutos após o pagamento.",
     found: "Acesso liberado! 🎉",
-    foundOther: "Esse email tem acesso a outro produto, mas não a este. Se acha que é engano, fale com o suporte abaixo.",
+    foundOther: "Esse email tem acesso a {p}, mas não a este. Se acha que é engano, fale com o suporte abaixo.",
     soon: "Checkout em breve. Fale com o suporte para liberar.",
     support: "Não funcionou? Mande um email para metodoalimentacionbiblica@gmail.com que liberamos seu acesso em poucos minutos.",
   },
@@ -90,7 +90,7 @@ const COPY = {
     restore: "Restaurar acceso",
     notFound: "No encontramos una compra activa con ese email. Verifica o espera unos minutos tras el pago.",
     found: "¡Acceso liberado! 🎉",
-    foundOther: "Ese email tiene acceso a otro producto, pero no a este. Si crees que es un error, contacta al soporte abajo.",
+    foundOther: "Ese email tiene acceso a {p}, pero no a este. Si crees que es un error, contacta al soporte abajo.",
     soon: "Checkout próximamente. Habla con soporte para liberar.",
     support: "¿No funcionó? Escribe a metodoalimentacionbiblica@gmail.com y liberamos tu acceso en pocos minutos.",
   },
@@ -110,9 +110,11 @@ function Paywall({ product }: { product: Produto }) {
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   // Store the message KIND (not the resolved string) so it follows language changes.
-  const [msg, setMsg] = useState<{ ok: boolean; kind: "found" | "foundOther" | "notFound" | "soon" } | null>(
-    null,
-  );
+  const [msg, setMsg] = useState<{
+    ok: boolean;
+    kind: "found" | "foundOther" | "notFound" | "soon";
+    otherProduct?: Produto;
+  } | null>(null);
 
   const checkout = () => {
     const url = CHECKOUT_URLS[product];
@@ -126,7 +128,7 @@ function Paywall({ product }: { product: Produto }) {
     const granted = await restoreByEmail(email);
     setBusy(false);
     if (granted.includes(product)) setMsg({ ok: true, kind: "found" });
-    else if (granted.length > 0) setMsg({ ok: false, kind: "foundOther" });
+    else if (granted.length > 0) setMsg({ ok: false, kind: "foundOther", otherProduct: granted[0] });
     else setMsg({ ok: false, kind: "notFound" });
   };
 
@@ -191,7 +193,11 @@ function Paywall({ product }: { product: Produto }) {
             <div
               className={`mt-3 space-y-2 rounded-xl p-3 text-center text-xs ${msg.ok ? "bg-sage/30 text-foreground" : "bg-terracotta/15 text-terracotta"}`}
             >
-              <p>{t[msg.kind]}</p>
+              <p>
+                {msg.kind === "foundOther" && msg.otherProduct
+                  ? t.foundOther.replace("{p}", PITCH[msg.otherProduct][lang].titulo)
+                  : t[msg.kind]}
+              </p>
               {!msg.ok && (
                 <p className="leading-relaxed">
                   {t.support.split("metodoalimentacionbiblica@gmail.com").map((part, i, arr) => (

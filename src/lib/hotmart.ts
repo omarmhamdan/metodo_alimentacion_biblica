@@ -77,11 +77,20 @@ async function writeEntitlement(
   email: string,
   product: Produto,
   active: boolean,
+  opts: { source?: string; restoredFrom?: string } = {},
 ): Promise<{ ok: boolean; error?: string }> {
   const url = env.SUPABASE_URL;
   const key = env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) return { ok: false, error: "supabase not configured" };
   try {
+    const row: Record<string, unknown> = {
+      email,
+      product,
+      active,
+      source: opts.source ?? "hotmart",
+      updated_at: new Date().toISOString(),
+    };
+    if (opts.restoredFrom !== undefined) row.restored_from = opts.restoredFrom;
     const res = await fetch(`${url}/rest/v1/entitlements?on_conflict=email,product`, {
       method: "POST",
       headers: {
@@ -90,19 +99,64 @@ async function writeEntitlement(
         "content-type": "application/json",
         prefer: "resolution=merge-duplicates,return=minimal",
       },
-      body: JSON.stringify({
-        email,
-        product,
-        active,
-        source: "hotmart",
-        updated_at: new Date().toISOString(),
-      }),
+      body: JSON.stringify(row),
     });
     if (!res.ok) return { ok: false, error: `supabase ${res.status}: ${await res.text()}` };
     return { ok: true };
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : String(err) };
   }
+}
+
+/** Read the active upsell products for an email (service role). */
+async function readActiveProducts(env: HotmartEnv, email: string): Promise<Produto[]> {
+  const url = env.SUPABASE_URL;
+  const key = env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key || !email) return [];
+  try {
+    const res = await fetch(
+      `${url}/rest/v1/entitlements?select=product&active=eq.true&email=eq.${encodeURIComponent(email)}`,
+      { headers: { apikey: key, authorization: `Bearer ${key}` } },
+    );
+    if (!res.ok) return [];
+    const rows = (await res.json()) as { product: string }[];
+    return rows
+      .map((r) => r.product)
+      .filter((p): p is Produto => p === "anti-inflamacao" || p === "mesa-unica");
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Restore-link: a user logged in with one email but bought with another.
+ * Verify the purchase email has active access and copy it onto the LOGIN email so
+ * the unlock is permanent, cross-device and visible in the admin (with the source
+ * purchase email recorded in restored_from).
+ */
+export async function handleRestoreLink(request: Request, env: HotmartEnv): Promise<Response> {
+  if (request.method !== "POST") return json({ error: "method not allowed" }, 405);
+  let body: { loginEmail?: unknown; purchaseEmail?: unknown };
+  try {
+    body = (await request.json()) as typeof body;
+  } catch {
+    return json({ error: "invalid json" }, 400);
+  }
+  const loginEmail = norm(body.loginEmail);
+  const purchaseEmail = norm(body.purchaseEmail);
+  if (!purchaseEmail) return json({ granted: [] });
+
+  const granted = await readActiveProducts(env, purchaseEmail);
+  // Persist onto the login email only when it differs (divergent purchase email).
+  if (loginEmail && loginEmail !== purchaseEmail && granted.length > 0) {
+    for (const product of granted) {
+      await writeEntitlement(env, loginEmail, product, true, {
+        source: "restore",
+        restoredFrom: purchaseEmail,
+      });
+    }
+  }
+  return json({ granted });
 }
 
 type LogRow = {

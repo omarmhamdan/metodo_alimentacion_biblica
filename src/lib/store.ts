@@ -3,6 +3,7 @@ import { getLang, setLang as setLangStorage, type Lang, T } from "./i18n";
 import { getRecipesLang, type Receita } from "./recipes";
 import { initImages, isImagesReady, getCachedImages } from "./image-store";
 import { upsertProfile, upsertDaily } from "./sync";
+import { clearEntitlements } from "./entitlements";
 
 export interface UserProfile {
   nome: string;
@@ -112,6 +113,7 @@ export function useUser() {
         upsertProfile(prev, daily).catch(() => {});
       }
       localStorage.removeItem(KEY_USER);
+      clearEntitlements(); // don't leak upsell access to the next login on this device
     }
     setUser(u);
   };

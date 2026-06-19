@@ -51,7 +51,12 @@ function norm(e: string | undefined | null): string {
   return (e ?? "").trim().toLowerCase();
 }
 
-/** Pull active products for a set of emails from Supabase and merge into cache. */
+/**
+ * Resolve access AUTHORITATIVELY from Supabase for a set of emails.
+ * On a successful fetch we REPLACE the cache (products not returned active = locked),
+ * so a revoke in admin actually re-locks the device. On failure (offline) we keep
+ * the existing cache, so a flaky network never wrongly blocks a paid user.
+ */
 async function pullFromCloud(emails: string[]): Promise<void> {
   if (!supabase || emails.length === 0) return;
   try {
@@ -60,10 +65,12 @@ async function pullFromCloud(emails: string[]): Promise<void> {
       .select("product, active")
       .in("email", emails)
       .eq("active", true);
-    if (error || !data) return;
+    if (error || !data) return; // keep cache on failure
+    const next: Record<string, boolean> = {};
     for (const row of data as { product: string; active: boolean }[]) {
-      if (row.active) _access[row.product] = true;
+      if (row.active) next[row.product] = true;
     }
+    _access = next; // authoritative — anything missing is now locked
     writeLS(LS_KEY, _access);
     emit();
   } catch {

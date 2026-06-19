@@ -212,21 +212,19 @@ export async function adminFetchEntitlements(
   const norms = Array.from(new Set(emails.map(norm).filter(Boolean)));
   if (norms.length === 0) return out;
   try {
-    const { data, error } = await supabase
-      .from("entitlements")
-      .select("email, product, active, restored_from")
-      .in("email", norms);
+    // select("*") tolerates the restored_from column not existing yet (pre-migration).
+    const { data, error } = await supabase.from("entitlements").select("*").in("email", norms);
     if (error || !data) return out;
     for (const row of data as {
       email: string;
       product: string;
       active: boolean;
-      restored_from: string | null;
+      restored_from?: string | null;
     }[]) {
       const e = norm(row.email);
       if (!out[e]) out[e] = {};
       if (row.product === "anti-inflamacao" || row.product === "mesa-unica") {
-        out[e][row.product as Produto] = { active: row.active, restoredFrom: row.restored_from };
+        out[e][row.product as Produto] = { active: row.active, restoredFrom: row.restored_from ?? null };
       }
     }
     return out;
@@ -247,12 +245,15 @@ export type EntitlementRow = {
 /** Admin: list ALL entitlement rows (the source of truth, independent of profiles). */
 export async function adminListAllEntitlements(): Promise<EntitlementRow[]> {
   if (!supabase) return [];
+  // select("*") tolerates the restored_from column not existing yet (pre-migration).
   const { data, error } = await supabase
     .from("entitlements")
-    .select("email, product, active, source, restored_from, updated_at")
+    .select("*")
     .order("updated_at", { ascending: false });
   if (error || !data) return [];
-  return data as EntitlementRow[];
+  return (data as (Omit<EntitlementRow, "restored_from"> & { restored_from?: string | null })[]).map(
+    (r) => ({ ...r, restored_from: r.restored_from ?? null }),
+  );
 }
 
 export type WebhookLogRow = {

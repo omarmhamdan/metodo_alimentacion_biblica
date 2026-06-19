@@ -78,7 +78,9 @@ const COPY = {
     restore: "Restaurar acesso",
     notFound: "Não encontramos uma compra ativa nesse email. Verifique ou aguarde alguns minutos após o pagamento.",
     found: "Acesso liberado! 🎉",
+    foundOther: "Esse email tem acesso a outro produto, mas não a este. Se acha que é engano, fale com o suporte abaixo.",
     soon: "Checkout em breve. Fale com o suporte para liberar.",
+    support: "Não funcionou? Mande um email para metodoalimentacionbiblica@gmail.com que liberamos seu acesso em poucos minutos.",
   },
   es: {
     locked: "Contenido bloqueado",
@@ -88,7 +90,9 @@ const COPY = {
     restore: "Restaurar acceso",
     notFound: "No encontramos una compra activa con ese email. Verifica o espera unos minutos tras el pago.",
     found: "¡Acceso liberado! 🎉",
+    foundOther: "Ese email tiene acceso a otro producto, pero no a este. Si crees que es un error, contacta al soporte abajo.",
     soon: "Checkout próximamente. Habla con soporte para liberar.",
+    support: "¿No funcionó? Escribe a metodoalimentacionbiblica@gmail.com y liberamos tu acceso en pocos minutos.",
   },
 };
 
@@ -105,12 +109,15 @@ function Paywall({ product }: { product: Produto }) {
   const [showRestore, setShowRestore] = useState(false);
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  // Store the message KIND (not the resolved string) so it follows language changes.
+  const [msg, setMsg] = useState<{ ok: boolean; kind: "found" | "foundOther" | "notFound" | "soon" } | null>(
+    null,
+  );
 
   const checkout = () => {
     const url = CHECKOUT_URLS[product];
     if (url) window.open(url, "_blank", "noopener");
-    else setMsg({ ok: false, text: t.soon });
+    else setMsg({ ok: false, kind: "soon" });
   };
 
   const restore = async () => {
@@ -118,8 +125,9 @@ function Paywall({ product }: { product: Produto }) {
     setMsg(null);
     const granted = await restoreByEmail(email);
     setBusy(false);
-    if (granted.includes(product)) setMsg({ ok: true, text: t.found });
-    else setMsg({ ok: false, text: t.notFound });
+    if (granted.includes(product)) setMsg({ ok: true, kind: "found" });
+    else if (granted.length > 0) setMsg({ ok: false, kind: "foundOther" });
+    else setMsg({ ok: false, kind: "notFound" });
   };
 
   return (
@@ -178,15 +186,31 @@ function Paywall({ product }: { product: Produto }) {
           >
             <RotateCcw className="h-3.5 w-3.5" /> {t.restore}
           </button>
-        </div>
-      )}
 
-      {msg && (
-        <p
-          className={`mt-3 rounded-xl p-3 text-center text-xs ${msg.ok ? "bg-sage/30 text-foreground" : "bg-terracotta/15 text-terracotta"}`}
-        >
-          {msg.text}
-        </p>
+          {msg && (
+            <p
+              className={`mt-3 rounded-xl p-3 text-center text-xs ${msg.ok ? "bg-sage/30 text-foreground" : "bg-terracotta/15 text-terracotta"}`}
+            >
+              {t[msg.kind]}
+            </p>
+          )}
+
+          <p className="mt-3 text-center text-[11px] leading-relaxed text-muted-foreground">
+            {t.support.split("metodoalimentacionbiblica@gmail.com").map((part, i, arr) => (
+              <span key={i}>
+                {part}
+                {i < arr.length - 1 && (
+                  <a
+                    href="mailto:metodoalimentacionbiblica@gmail.com"
+                    className="font-medium text-olive underline underline-offset-2"
+                  >
+                    metodoalimentacionbiblica@gmail.com
+                  </a>
+                )}
+              </span>
+            ))}
+          </p>
+        </div>
       )}
     </div>
   );

@@ -25,7 +25,7 @@ export const Route = createFileRoute("/perfil")({
   // title set by AppShell bootstrap (per-language)
 });
 
-type Modal = "preferences" | "edit_goal" | "help" | null;
+type Modal = "preferences" | "edit_goal" | "edit_name" | "help" | null;
 
 const SUPPORT_EMAIL = "metodoalimentacionbiblica@gmail.com";
 
@@ -39,6 +39,7 @@ function PerfilPage() {
   const favRecipes = allRecipes.filter((r) => (daily.favoritos ?? []).includes(r.id));
   const [modal, setModal] = useState<Modal>(null);
   const [goalDraft, setGoalDraft] = useState("");
+  const [nameDraft, setNameDraft] = useState("");
 
   return (
     <AppShell>
@@ -53,7 +54,19 @@ function PerfilPage() {
               k="prof_subtitle"
               className="block text-[11px] uppercase tracking-[0.22em] text-muted-foreground"
             />
-            <h1 className="font-serif text-2xl leading-tight text-foreground">{nome}</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="font-serif text-2xl leading-tight text-foreground">{nome}</h1>
+              <button
+                onClick={() => {
+                  setNameDraft(user?.nome ?? "");
+                  setModal("edit_name");
+                }}
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-secondary text-muted-foreground transition-colors hover:bg-highlight hover:text-earth"
+                aria-label={t("prof_name_edit")}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
+            </div>
             {user?.email && <p className="text-xs text-muted-foreground">{user.email}</p>}
           </div>
         </div>
@@ -235,6 +248,43 @@ function PerfilPage() {
                       setModal(null);
                     }}
                     className="mt-4 w-full rounded-2xl bg-gradient-primary py-3 text-sm font-medium text-primary-foreground"
+                  >
+                    {t("prof_goal_save")}
+                  </button>
+                </>
+              )}
+
+              {modal === "edit_name" && (
+                <>
+                  <div className="mb-5 flex items-center justify-between">
+                    <h2 className="font-serif text-xl text-foreground">{t("prof_name_label")}</h2>
+                    <button
+                      onClick={() => setModal(null)}
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary text-muted-foreground"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <input
+                    value={nameDraft}
+                    onChange={(e) => setNameDraft(e.target.value)}
+                    placeholder={t("prof_name_placeholder")}
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && nameDraft.trim()) {
+                        save({ ...user!, nome: nameDraft.trim() });
+                        setModal(null);
+                      }
+                    }}
+                    className="w-full rounded-2xl border border-border bg-secondary px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-olive/50 focus:ring-2 focus:ring-olive/10"
+                  />
+                  <button
+                    disabled={!nameDraft.trim()}
+                    onClick={() => {
+                      save({ ...user!, nome: nameDraft.trim() });
+                      setModal(null);
+                    }}
+                    className="mt-4 w-full rounded-2xl bg-gradient-primary py-3 text-sm font-medium text-primary-foreground disabled:opacity-50"
                   >
                     {t("prof_goal_save")}
                   </button>

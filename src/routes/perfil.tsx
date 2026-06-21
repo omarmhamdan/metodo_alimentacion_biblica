@@ -1,5 +1,17 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { Heart, LogOut, Pencil, Plus, Settings, Target, Trash2, X } from "lucide-react";
+import {
+  ChevronDown,
+  Heart,
+  HelpCircle,
+  LogOut,
+  Mail,
+  Pencil,
+  Plus,
+  Settings,
+  Target,
+  Trash2,
+  X,
+} from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence, type PanInfo } from "framer-motion";
 import { AppShell } from "@/components/AppShell";
@@ -13,7 +25,9 @@ export const Route = createFileRoute("/perfil")({
   // title set by AppShell bootstrap (per-language)
 });
 
-type Modal = "preferences" | "edit_goal" | null;
+type Modal = "preferences" | "edit_goal" | "help" | null;
+
+const SUPPORT_EMAIL = "metodoalimentacionbiblica@gmail.com";
 
 function PerfilPage() {
   const { user, save } = useUser();
@@ -114,6 +128,12 @@ function PerfilPage() {
           label={t("prof_preferences")}
           hint={t("prof_preferences_hint")}
           onClick={() => setModal("preferences")}
+        />
+        <Row
+          icon={HelpCircle}
+          label={t("prof_help")}
+          hint={t("prof_help_hint")}
+          onClick={() => setModal("help")}
         />
       </section>
 
@@ -220,6 +240,59 @@ function PerfilPage() {
                   </button>
                 </>
               )}
+
+              {modal === "help" && (
+                <>
+                  <div className="mb-5 flex items-center justify-between">
+                    <h2 className="font-serif text-xl text-foreground">{t("help_title")}</h2>
+                    <button
+                      onClick={() => setModal(null)}
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary text-muted-foreground"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+
+                  <div className="max-h-[55vh] overflow-y-auto -mx-1 px-1">
+                    <p className="mb-3 text-xs uppercase tracking-widest text-muted-foreground">
+                      {t("help_faq_label")}
+                    </p>
+                    <div className="space-y-2">
+                      {(
+                        [
+                          ["faq_access_q", "faq_access_a"],
+                          ["faq_install_q", "faq_install_a"],
+                          ["faq_data_q", "faq_data_a"],
+                          ["faq_refund_q", "faq_refund_a"],
+                        ] as const
+                      ).map(([q, a]) => (
+                        <FaqItem key={q} question={t(q)} answer={t(a)} />
+                      ))}
+                    </div>
+
+                    <div className="mt-5 rounded-2xl bg-gradient-devotional p-5 shadow-card">
+                      <p className="font-serif text-base text-foreground">{t("help_contact_label")}</p>
+                      <p className="mt-1 text-sm text-muted-foreground">{t("help_contact_body")}</p>
+                      <a
+                        href={`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(t("help_email_subject"))}`}
+                        className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-primary py-3 text-sm font-medium text-primary-foreground"
+                      >
+                        <Mail className="h-4 w-4" /> {t("help_email_btn")}
+                      </a>
+                      <p className="mt-3 text-center text-[11px] text-muted-foreground">
+                        {SUPPORT_EMAIL}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => setModal(null)}
+                    className="mt-5 w-full rounded-2xl border border-border bg-card py-3 text-sm font-medium text-muted-foreground"
+                  >
+                    {t("help_close")}
+                  </button>
+                </>
+              )}
             </motion.div>
           </motion.div>
         )}
@@ -288,6 +361,59 @@ function FavRow({
         </Link>
       </motion.div>
     </li>
+  );
+}
+
+function FaqItem({ question, answer }: { question: string; answer: string }) {
+  const [open, setOpen] = useState(false);
+
+  // Render the answer with the support email turned into a clickable mailto link.
+  const linkifyEmail = (text: string) => {
+    if (!text.includes(SUPPORT_EMAIL)) return text;
+    return text.split(SUPPORT_EMAIL).flatMap((part, i, arr) =>
+      i < arr.length - 1
+        ? [
+            part,
+            <a
+              key={i}
+              href={`mailto:${SUPPORT_EMAIL}`}
+              className="font-medium text-earth underline underline-offset-2"
+            >
+              {SUPPORT_EMAIL}
+            </a>,
+          ]
+        : [part],
+    );
+  };
+
+  return (
+    <div className="overflow-hidden rounded-2xl border border-border bg-card">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center gap-3 px-4 py-3 text-left"
+      >
+        <span className="flex-1 text-sm font-medium text-foreground">{question}</span>
+        <ChevronDown
+          className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${
+            open ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <p className="px-4 pb-4 text-sm leading-relaxed text-muted-foreground">
+              {linkifyEmail(answer)}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 

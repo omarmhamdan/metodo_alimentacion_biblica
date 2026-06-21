@@ -121,7 +121,30 @@ export const T = {
     prof_notifications_hint: "Recordatorios suaves durante el día",
     prof_preferences: "Preferencias",
     prof_preferences_hint: "Idioma y configuración",
+    prof_help: "Ayuda y soporte",
+    prof_help_hint: "Preguntas frecuentes y contacto",
     prof_signout: "Salir",
+
+    // Help & support modal
+    help_title: "Ayuda y soporte",
+    help_faq_label: "Preguntas frecuentes",
+    help_contact_label: "¿Necesitas hablar con nosotros?",
+    help_contact_body: "Escríbenos y te respondemos en pocos minutos. Estamos aquí para ayudarte.",
+    help_email_btn: "Escribir por correo",
+    help_email_subject: "Soporte — Método Alimentación Bíblica",
+    help_close: "Cerrar",
+    faq_access_q: "Compré pero no puedo acceder, ¿qué hago?",
+    faq_access_a:
+      "Ingresa con el mismo correo que usaste en la compra. Si aún no entra, escríbenos a metodoalimentacionbiblica@gmail.com y liberamos tu acceso en pocos minutos.",
+    faq_install_q: "¿Cómo instalo la app en mi celular?",
+    faq_install_a:
+      "Abre el menú de tu navegador y toca \"Agregar a la pantalla de inicio\". La app quedará como un ícono normal, sin ocupar espacio.",
+    faq_data_q: "¿Pierdo mis datos si cambio de celular?",
+    faq_data_a:
+      "No. Entra con el mismo correo en el nuevo dispositivo y tu progreso, favoritos y objetivos vuelven automáticamente.",
+    faq_refund_q: "¿Tengo garantía?",
+    faq_refund_a:
+      "Sí. Tienes garantía de devolución según las políticas de la plataforma de compra. Antes de pedirla, escríbenos a metodoalimentacionbiblica@gmail.com: casi siempre resolvemos el problema al instante.",
     prof_verse:
       '"Venid a mí todos los que estáis cansados y cargados, y yo os haré descansar." — Mateo 11:28',
 
@@ -259,7 +282,30 @@ export const T = {
     prof_notifications_hint: "Lembretes gentis durante o dia",
     prof_preferences: "Preferências",
     prof_preferences_hint: "Idioma e configurações",
+    prof_help: "Ajuda e suporte",
+    prof_help_hint: "Perguntas frequentes e contato",
     prof_signout: "Sair",
+
+    // Help & support modal
+    help_title: "Ajuda e suporte",
+    help_faq_label: "Perguntas frequentes",
+    help_contact_label: "Precisa falar com a gente?",
+    help_contact_body: "Escreva pra gente que respondemos em poucos minutos. Estamos aqui pra te ajudar.",
+    help_email_btn: "Escrever por e-mail",
+    help_email_subject: "Suporte — Método Alimentação Bíblica",
+    help_close: "Fechar",
+    faq_access_q: "Comprei mas não consigo acessar, e agora?",
+    faq_access_a:
+      "Entre com o mesmo e-mail que usou na compra. Se ainda não liberar, escreva pra gente em metodoalimentacionbiblica@gmail.com que liberamos seu acesso em poucos minutos.",
+    faq_install_q: "Como instalo o app no meu celular?",
+    faq_install_a:
+      "Abra o menu do seu navegador e toque em \"Adicionar à tela de início\". O app fica como um ícone normal, sem ocupar espaço.",
+    faq_data_q: "Perco meus dados se trocar de celular?",
+    faq_data_a:
+      "Não. Entre com o mesmo e-mail no aparelho novo e seu progresso, favoritos e objetivos voltam automaticamente.",
+    faq_refund_q: "Tenho garantia?",
+    faq_refund_a:
+      "Sim. Você tem garantia de reembolso conforme as políticas da plataforma de compra. Antes de pedir, fale com a gente em metodoalimentacionbiblica@gmail.com: quase sempre resolvemos o problema na hora.",
     prof_verse:
       '"Vinde a mim, todos os que estais cansados e sobrecarregados, e eu vos aliviarei." — Mateus 11:28',
 

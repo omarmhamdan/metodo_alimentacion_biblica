@@ -52,8 +52,8 @@ function LandingLogin() {
   }, []);
 
   useEffect(() => {
-    if (user?.onboarded) navigate({ to: "/dashboard" });
-    else if (user) navigate({ to: "/onboarding" });
+    if (user?.onboarded) navigate({ to: "/dashboard", replace: true });
+    else if (user) navigate({ to: "/onboarding", replace: true });
   }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -78,7 +78,7 @@ function LandingLogin() {
         localStorage.setItem("mab:daily", JSON.stringify(local.daily));
         window.dispatchEvent(new CustomEvent("mab:storage", { detail: "mab:daily" }));
       }
-      navigate({ to: local.user.onboarded ? "/dashboard" : "/onboarding" });
+      navigate({ to: local.user.onboarded ? "/dashboard" : "/onboarding", replace: true });
       return;
     }
 
@@ -95,7 +95,7 @@ function LandingLogin() {
         fetchRecipePhotos()
           .then((urls) => mergeCloudImages(urls))
           .catch(() => {});
-        navigate({ to: cloud.user.onboarded ? "/dashboard" : "/onboarding" });
+        navigate({ to: cloud.user.onboarded ? "/dashboard" : "/onboarding", replace: true });
         return;
       }
     } catch (err) {
@@ -112,7 +112,7 @@ function LandingLogin() {
     save(newUser);
     upsertProfile(newUser).catch(() => {}); // fire-and-forget cloud insert
     setLoading(false);
-    navigate({ to: "/onboarding" });
+    navigate({ to: "/onboarding", replace: true });
   };
 
   return (

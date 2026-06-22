@@ -171,7 +171,7 @@ function PerfilPage() {
       <button
         onClick={() => {
           save(null);
-          navigate({ to: "/" });
+          navigate({ to: "/", replace: true });
         }}
         className="mx-6 mb-6 inline-flex w-[calc(100%-3rem)] items-center justify-center gap-2 rounded-2xl border border-border bg-card py-3.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
       >

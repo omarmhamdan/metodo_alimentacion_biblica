@@ -113,7 +113,7 @@ function OnboardingPage() {
   const [restricoes, setRestricoes] = useState("");
 
   useEffect(() => {
-    if (!user) navigate({ to: "/" });
+    if (!user) navigate({ to: "/", replace: true });
   }, [user, navigate]);
 
   const totalSteps = 5;
@@ -133,7 +133,7 @@ function OnboardingPage() {
       restricoes,
       onboarded: true,
     });
-    navigate({ to: "/dashboard" });
+    navigate({ to: "/dashboard", replace: true });
   };
 
   const verse = c.verses[Math.min(step, c.verses.length - 1)];
@@ -291,7 +291,7 @@ function OnboardingPage() {
             if (step > 0) back();
             else {
               save(null);
-              navigate({ to: "/" });
+              navigate({ to: "/", replace: true });
             }
           }}
           className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border bg-card text-foreground shadow-card transition-colors hover:bg-secondary"

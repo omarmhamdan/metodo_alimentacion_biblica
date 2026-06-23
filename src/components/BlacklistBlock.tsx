@@ -4,7 +4,6 @@
 
 import { ShieldAlert, ArrowRight } from "lucide-react";
 import { useLang } from "@/lib/store";
-import type { BlacklistInfo } from "@/lib/entitlements";
 
 // Checkout do "Método Alimentación Bíblica" (produto principal).
 export const REBUY_CHECKOUT_URL = "https://pay.hotmart.com/E106250747Q?checkoutMode=10";
@@ -13,22 +12,20 @@ const COPY = {
   pt: {
     badge: "Acesso bloqueado",
     title: "Seu acesso foi bloqueado",
-    body: "Identificamos um pedido de cancelamento/reembolso feito por você. Por isso, o acesso ao material com este email está bloqueado.",
-    reasonLabel: "Motivo",
+    body: "Identificamos um pedido de reembolso feito por você. Por isso, o acesso ao material está bloqueado.",
     cta_intro: "Quer liberar seu acesso novamente? Clique no botão abaixo e finalize sua compra.",
     cta: "Finalizar compra e liberar acesso",
   },
   es: {
     badge: "Acceso bloqueado",
     title: "Tu acceso fue bloqueado",
-    body: "Identificamos una solicitud de cancelación/reembolso hecha por ti. Por eso, el acceso al material con este email está bloqueado.",
-    reasonLabel: "Motivo",
+    body: "Identificamos una solicitud de reembolso hecha por ti. Por eso, el acceso al material está bloqueado.",
     cta_intro: "¿Quieres recuperar tu acceso? Haz clic en el botón de abajo y finaliza tu compra.",
     cta: "Finalizar compra y liberar acceso",
   },
 };
 
-export function BlacklistBlock({ info }: { info: BlacklistInfo }) {
+export function BlacklistBlock() {
   const { lang } = useLang();
   const t = COPY[lang];
   return (
@@ -44,17 +41,6 @@ export function BlacklistBlock({ info }: { info: BlacklistInfo }) {
           {t.title}
         </h1>
         <p className="mt-3 text-sm leading-relaxed text-red-700/90">{t.body}</p>
-
-        {info.email && (
-          <p className="mt-3 break-all rounded-xl bg-red-500/10 px-3 py-2 text-xs font-medium text-red-700">
-            {info.email}
-          </p>
-        )}
-        {info.reason && (
-          <p className="mt-2 text-xs text-red-600/80">
-            {t.reasonLabel}: {info.reason}
-          </p>
-        )}
       </div>
 
       <p className="mt-6 px-2 text-center text-sm text-muted-foreground">{t.cta_intro}</p>

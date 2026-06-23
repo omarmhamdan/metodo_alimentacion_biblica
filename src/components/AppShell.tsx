@@ -86,7 +86,7 @@ export function AppShell({ children, hideNav }: { children: ReactNode; hideNav?:
           <span className="text-sm">{lang === "es" ? "🇨🇴" : "🇧🇷"}</span>
           <span>{lang === "es" ? "ES" : "PT"}</span>
         </button>
-        <BlacklistBlock info={blacklist} />
+        <BlacklistBlock />
       </div>
     );
   }

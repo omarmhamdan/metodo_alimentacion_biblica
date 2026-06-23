@@ -144,7 +144,7 @@ function LandingLogin() {
             🇧🇷 Português
           </button>
         </div>
-        <BlacklistBlock info={blocked} />
+        <BlacklistBlock />
       </div>
     );
   }

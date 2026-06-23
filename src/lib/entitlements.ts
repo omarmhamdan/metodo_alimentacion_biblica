@@ -33,6 +33,7 @@ export type BlacklistInfo = { email: string; reason: string | null };
 
 let _access: Record<string, boolean> = {};
 let _emails: string[] = [];
+let _loginEmail = ""; // the current account email — blacklist is keyed ONLY to this
 let _blacklist: BlacklistInfo | null = null;
 
 function readLS<T>(k: string, fb: T): T {
@@ -102,7 +103,10 @@ async function pullFromCloud(emails: string[]): Promise<void> {
  * block by going offline. No emails → never blacklisted (plain visitor).
  */
 async function refreshBlacklist(): Promise<void> {
-  if (_emails.length === 0) {
+  // Keyed to the LOGIN email only — never to restored/typed purchase emails, so a
+  // user can't be blocked by a refunded email they merely typed in "Já comprei",
+  // nor inherit a previous user's block on a shared device.
+  if (!_loginEmail) {
     if (_blacklist) {
       _blacklist = null;
       writeLS(LS_BLACKLIST, null);
@@ -115,7 +119,7 @@ async function refreshBlacklist(): Promise<void> {
     const { data, error } = await supabase
       .from("blacklist")
       .select("email, reason")
-      .in("email", _emails)
+      .eq("email", _loginEmail)
       .limit(1);
     if (error || !data) return; // keep cache on failure
     const next: BlacklistInfo | null =
@@ -139,6 +143,13 @@ export async function initEntitlements(loginEmail?: string): Promise<void> {
   _emails = readLS<string[]>(LS_EMAILS, []);
   _blacklist = readLS<BlacklistInfo | null>(LS_BLACKLIST, null);
   const le = norm(loginEmail);
+  _loginEmail = le;
+  // Drop a cached block that isn't for the current account (e.g. previous user on
+  // a shared device) so it never flashes before the authoritative re-check.
+  if (_blacklist && norm(_blacklist.email) !== le) {
+    _blacklist = null;
+    writeLS(LS_BLACKLIST, null);
+  }
   if (le && !_emails.includes(le)) {
     _emails.push(le);
     writeLS(LS_EMAILS, _emails);
@@ -153,6 +164,7 @@ export async function initEntitlements(loginEmail?: string): Promise<void> {
 export function clearEntitlements(): void {
   _access = {};
   _emails = [];
+  _loginEmail = "";
   _blacklist = null;
   if (typeof window !== "undefined") {
     localStorage.removeItem(LS_KEY);
@@ -428,14 +440,12 @@ export async function adminRemoveBlacklist(email: string): Promise<boolean> {
 export async function adminAddBlacklist(email: string, reason: string): Promise<boolean> {
   const e = norm(email);
   if (!supabase || !e) return false;
-  const { error } = await supabase
-    .from("blacklist")
-    .upsert({
-      email: e,
-      reason: reason || null,
-      source: "admin",
-      created_at: new Date().toISOString(),
-    });
+  const { error } = await supabase.from("blacklist").upsert({
+    email: e,
+    reason: reason || null,
+    source: "admin",
+    created_at: new Date().toISOString(),
+  });
   return !error;
 }
 

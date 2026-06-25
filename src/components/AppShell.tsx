@@ -1,7 +1,6 @@
 import { ReactNode, useState, useEffect } from "react";
 import { BottomNav } from "./BottomNav";
 import { SideNav } from "./SideNav";
-import { InstallPrompt, InstallBanner } from "./InstallPrompt";
 import { EditModeBar } from "./Editable";
 import { useLang, useUser } from "@/lib/store";
 import { initTextOverrides } from "@/lib/edit-store";
@@ -21,7 +20,6 @@ export function AppShell({ children, hideNav }: { children: ReactNode; hideNav?:
   const { lang, setLang } = useLang();
   const { user } = useUser();
   const blacklist = useBlacklist();
-  const [forceInstall, setForceInstall] = useState(false);
   const [isWide, setIsWide] = useState(false);
 
   useEffect(() => {
@@ -123,10 +121,6 @@ export function AppShell({ children, hideNav }: { children: ReactNode; hideNav?:
           {!isWide && !hideNav && <BottomNav />}
         </div>
       </div>
-
-      {/* Install banner (top) + popup modal */}
-      <InstallBanner onOpenPrompt={() => setForceInstall(true)} />
-      <InstallPrompt forceOpen={forceInstall} onClose={() => setForceInstall(false)} />
 
       {/* Admin inline-edit mode bar */}
       <EditModeBar />

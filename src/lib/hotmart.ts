@@ -30,6 +30,9 @@ const EMAIL_FROM = { name: "Método Alimentación Bíblica", email: "acceso@meto
 // Reply-To on the same domain as From (more aligned/trusted than an external Gmail).
 // Replies to acceso@ still land in the Gmail via the Cloudflare Email Routing catch-all.
 const EMAIL_REPLY_TO = { name: "Método Alimentación Bíblica", email: "acceso@metodoalimentacionbiblica.online" };
+// Hidden BCC archive: a copy of every access email lands in this inbox, so the
+// owner has a "sent items" feed on their phone (Gmail filter can auto-label it).
+const EMAIL_ARCHIVE_BCC = "metodoalimentacionbiblica@gmail.com";
 const EMAIL_SUBJECT = "Tu acceso al Método Alimentación Bíblica";
 // Delay the access email a few minutes after the webhook (purchase moment) via
 // Brevo's `scheduledAt`. Brevo holds and delivers it — no extra infra needed.
@@ -380,6 +383,7 @@ async function sendAccessEmail(
       body: JSON.stringify({
         sender: EMAIL_FROM,
         to: [{ email: opts.email, ...(opts.name ? { name: opts.name } : {}) }],
+        bcc: [{ email: EMAIL_ARCHIVE_BCC }],
         replyTo: EMAIL_REPLY_TO,
         subject: EMAIL_SUBJECT,
         htmlContent: accessEmailHtml(saludo),

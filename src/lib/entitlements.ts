@@ -57,6 +57,38 @@ function norm(e: string | undefined | null): string {
   return (e ?? "").trim().toLowerCase();
 }
 
+type ResolveResult = {
+  products: Produto[];
+  blacklist: { email: string; reason: string | null } | null;
+};
+
+/**
+ * Resolve access (active products) + blacklist via the Worker data API.
+ * Returns null on failure (offline) so callers can keep their cached state.
+ * The `profiles`/`entitlements`/`blacklist` tables are RLS-locked — the anon
+ * client can't read them; only this same-origin endpoint (service_role) can.
+ */
+async function resolveAccess(emails: string[], loginEmail: string): Promise<ResolveResult | null> {
+  if (typeof window === "undefined") return null; // browser-only (relative URL)
+  try {
+    const res = await fetch("/api/access/resolve", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ emails, loginEmail }),
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as ResolveResult;
+    return {
+      products: (data.products ?? []).filter(
+        (p): p is Produto => p === "anti-inflamacao" || p === "mesa-unica",
+      ),
+      blacklist: data.blacklist ?? null,
+    };
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Resolve access AUTHORITATIVELY from Supabase for a set of emails.
  * On a successful fetch we REPLACE the cache (products not returned active = locked),
@@ -76,24 +108,13 @@ async function pullFromCloud(emails: string[]): Promise<void> {
     }
     return;
   }
-  if (!supabase) return; // can't validate; keep cache so a paid user stays unlocked offline
-  try {
-    const { data, error } = await supabase
-      .from("entitlements")
-      .select("product, active")
-      .in("email", emails)
-      .eq("active", true);
-    if (error || !data) return; // keep cache on failure
-    const next: Record<string, boolean> = {};
-    for (const row of data as { product: string; active: boolean }[]) {
-      if (row.active) next[row.product] = true;
-    }
-    _access = next; // authoritative — anything missing is now locked
-    writeLS(LS_KEY, _access);
-    emit();
-  } catch {
-    /* offline — keep local */
-  }
+  const result = await resolveAccess(emails, _loginEmail);
+  if (!result) return; // offline / failure — keep cache so a paid user stays unlocked
+  const next: Record<string, boolean> = {};
+  for (const product of result.products) next[product] = true;
+  _access = next; // authoritative — anything missing is now locked
+  writeLS(LS_KEY, _access);
+  emit();
 }
 
 /**
@@ -114,27 +135,11 @@ async function refreshBlacklist(): Promise<void> {
     }
     return;
   }
-  if (!supabase) return; // can't validate — keep cached block
-  try {
-    const { data, error } = await supabase
-      .from("blacklist")
-      .select("email, reason")
-      .eq("email", _loginEmail)
-      .limit(1);
-    if (error || !data) return; // keep cache on failure
-    const next: BlacklistInfo | null =
-      data.length > 0
-        ? {
-            email: String((data[0] as { email: string }).email),
-            reason: (data[0] as { reason: string | null }).reason ?? null,
-          }
-        : null;
-    _blacklist = next;
-    writeLS(LS_BLACKLIST, _blacklist);
-    emit();
-  } catch {
-    /* offline — keep cached block */
-  }
+  const result = await resolveAccess([], _loginEmail);
+  if (!result) return; // offline / failure — keep cached block
+  _blacklist = result.blacklist;
+  writeLS(LS_BLACKLIST, _blacklist);
+  emit();
 }
 
 /** Load cached access + refresh from cloud for the logged-in email. Call at startup. */
@@ -187,18 +192,9 @@ export function blacklistInfo(): BlacklistInfo | null {
  */
 export async function checkBlacklist(email: string): Promise<BlacklistInfo | null> {
   const e = norm(email);
-  if (!supabase || !e) return null;
-  try {
-    const { data, error } = await supabase
-      .from("blacklist")
-      .select("email, reason")
-      .eq("email", e)
-      .limit(1);
-    if (error || !data || data.length === 0) return null;
-    return { email: e, reason: (data[0] as { reason: string | null }).reason ?? null };
-  } catch {
-    return null;
-  }
+  if (!e) return null;
+  const result = await resolveAccess([], e);
+  return result?.blacklist ?? null;
 }
 
 /** Reactive blacklist gate for components (null = not blocked). */
@@ -265,21 +261,8 @@ export async function restoreByEmail(email: string): Promise<Produto[]> {
     /* fall through to direct read */
   }
 
-  // Fallback: direct read (device-local only) if the endpoint gave nothing.
-  if (granted.length === 0 && supabase) {
-    try {
-      const { data } = await supabase
-        .from("entitlements")
-        .select("product, active")
-        .eq("email", e)
-        .eq("active", true);
-      granted = ((data ?? []) as { product: string; active: boolean }[])
-        .filter((r) => r.active)
-        .map((r) => r.product as Produto);
-    } catch {
-      /* offline */
-    }
-  }
+  // No direct-read fallback: the entitlements table is RLS-locked to the anon
+  // client. /api/restore (service_role, behind the Worker) is the source of truth.
 
   for (const p of granted) _access[p] = true;
   writeLS(LS_KEY, _access);

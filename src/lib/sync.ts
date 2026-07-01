@@ -7,41 +7,57 @@ import type { UserProfile, DailyState } from "./store";
 const PHOTOS_BUCKET = "recipe-photos";
 
 // ── Profile + daily ──────────────────────────────────────────────────────────
+// These go through the Worker data API (/api/profile/*) instead of hitting the
+// `profiles` table directly with the public anon key. The table is RLS-locked;
+// the Worker uses the service_role key and only ever touches a single email.
+
+/** POST JSON to a same-origin Worker endpoint. Returns parsed body or null. */
+async function postApi<T>(path: string, body: unknown): Promise<T | null> {
+  if (typeof window === "undefined") return null; // browser-only (relative URL)
+  try {
+    const res = await fetch(path, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) return null;
+    return (await res.json()) as T;
+  } catch {
+    return null;
+  }
+}
 
 /** Pull profile + daily from cloud by email. Returns null if not found. */
 export async function fetchProfileByEmail(
   email: string,
 ): Promise<{ user: UserProfile; daily?: DailyState } | null> {
-  if (!supabase) return null;
   const key = email.trim().toLowerCase();
   if (!key) return null;
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("email", key)
-    .maybeSingle();
-  if (error || !data) return null;
+  const out = await postApi<{ profile: Record<string, unknown> | null }>("/api/profile/get", {
+    email: key,
+  });
+  const data = out?.profile;
+  if (!data) return null;
   const user: UserProfile = {
-    nome: data.nome ?? "",
-    email: data.email,
-    idade: data.idade ?? undefined,
-    pesoAtual: data.peso_atual ?? undefined,
-    objetivo: data.objetivo ?? undefined,
-    energia: data.energia ?? undefined,
-    aguaMeta: data.agua_meta ?? 2000,
-    restricoes: data.restricoes ?? undefined,
+    nome: (data.nome as string) ?? "",
+    email: data.email as string,
+    idade: (data.idade as number) ?? undefined,
+    pesoAtual: (data.peso_atual as number) ?? undefined,
+    objetivo: (data.objetivo as string) ?? undefined,
+    energia: (data.energia as number) ?? undefined,
+    aguaMeta: (data.agua_meta as number) ?? 2000,
+    restricoes: (data.restricoes as string) ?? undefined,
     onboarded: !!data.onboarded,
-    createdAt: data.created_at,
+    createdAt: data.created_at as string,
   };
-  return { user, daily: data.daily ?? undefined };
+  return { user, daily: (data.daily as DailyState) ?? undefined };
 }
 
 /** Upsert profile + daily into cloud (idempotent, fire-and-forget). */
 export async function upsertProfile(user: UserProfile, daily?: DailyState): Promise<void> {
-  if (!supabase) return;
   const key = (user.email ?? "").trim().toLowerCase();
   if (!key) return;
-  const payload: Record<string, unknown> = {
+  const row: Record<string, unknown> = {
     email: key,
     nome: user.nome ?? "",
     idade: user.idade ?? null,
@@ -52,18 +68,15 @@ export async function upsertProfile(user: UserProfile, daily?: DailyState): Prom
     restricoes: user.restricoes ?? null,
     onboarded: !!user.onboarded,
   };
-  if (daily) payload.daily = daily;
-  const { error } = await supabase.from("profiles").upsert(payload);
-  if (error) console.warn("[Sync] upsertProfile failed", error.message);
+  if (daily) row.daily = daily;
+  await postApi("/api/profile/upsert", { row });
 }
 
 /** Push only the daily snapshot (smaller write). */
 export async function upsertDaily(email: string, daily: DailyState): Promise<void> {
-  if (!supabase) return;
   const key = email.trim().toLowerCase();
   if (!key) return;
-  const { error } = await supabase.from("profiles").update({ daily }).eq("email", key);
-  if (error) console.warn("[Sync] upsertDaily failed", error.message);
+  await postApi("/api/profile/upsert", { row: { email: key, daily } });
 }
 
 // ── Recipe photos (GLOBAL — admin uploads visible to all users) ─────────────

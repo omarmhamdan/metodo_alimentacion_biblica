@@ -3,6 +3,12 @@ import "./lib/error-capture";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 import { handleHotmartWebhook, handleRestoreLink, type HotmartEnv } from "./lib/hotmart";
+import {
+  handleProfileGet,
+  handleProfileUpsert,
+  handleAccessResolve,
+  type DataEnv,
+} from "./lib/data-api";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -77,6 +83,16 @@ export default {
       }
       if (url.pathname === "/api/restore") {
         return await handleRestoreLink(request, env as HotmartEnv);
+      }
+      // User-facing data proxy (RLS-locked tables, service_role behind the Worker).
+      if (url.pathname === "/api/profile/get") {
+        return await handleProfileGet(request, env as DataEnv);
+      }
+      if (url.pathname === "/api/profile/upsert") {
+        return await handleProfileUpsert(request, env as DataEnv);
+      }
+      if (url.pathname === "/api/access/resolve") {
+        return await handleAccessResolve(request, env as DataEnv);
       }
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);

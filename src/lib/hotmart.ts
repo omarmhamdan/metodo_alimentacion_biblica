@@ -20,6 +20,7 @@ export type HotmartEnv = {
   SUPABASE_URL?: string;
   SUPABASE_SERVICE_ROLE_KEY?: string;
   HOTMART_PRODUCT_MAP?: string;
+  HOTMART_MAIN_PRODUCT_ID?: string;
   BREVO_API_KEY?: string;
 };
 
@@ -92,10 +93,9 @@ function mapProduct(product: unknown, env: HotmartEnv): Produto | null {
   const hit = map[String(p.id)] ?? map[String(p.ucode)];
   if (hit === "mesa-unica" || hit === "anti-inflamacao") return hit;
 
-  // 2) Name heuristic fallback.
-  const name = String(p.name ?? "").toLowerCase();
-  if (name.includes("mesa")) return "mesa-unica";
-  if (name.includes("inflam")) return "anti-inflamacao";
+  // No name-heuristic fallback on purpose: matching by name (e.g. "mesa"/"inflam")
+  // would also catch the English products sharing the same Hotmart account, whose
+  // webhooks reach this worker. Upsells must be matched by explicit Spanish id.
   return null;
 }
 
@@ -520,6 +520,23 @@ export async function handleHotmartWebhook(request: Request, env: HotmartEnv): P
   const product = mapProduct(data.product, env);
   const grant = GRANT_EVENTS.has(event);
   const revoke = REVOKE_EVENTS.has(event);
+
+  // ── Funnel scope guard ───────────────────────────────────────────────────────
+  // The same Hotmart account also sells the English products, and its webhook
+  // fires for EVERY product. Only act on THIS funnel's products — the Spanish
+  // main product (HOTMART_MAIN_PRODUCT_ID, default 7909623) or a mapped Spanish
+  // upsell. Anything else (e.g. an English-checkout purchase) is ignored: no
+  // email, no blacklist, no entitlement. This stops the duplicate email.
+  const mainProductId = env.HOTMART_MAIN_PRODUCT_ID || "7909623";
+  const isMainProduct = base.product_id === mainProductId;
+  if (!product && !isMainProduct) {
+    await logWebhook(env, {
+      ...base,
+      result: "skipped",
+      detail: "foreign product — not this funnel",
+    });
+    return json({ ok: true, skipped: "foreign product" });
+  }
 
   // ── MAIN product (not one of the two upsells) ────────────────────────────────
   // Refund/chargeback/protest/cancel → blacklist the buyer (blocks ALL app access).

@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { getLang, setLang as setLangStorage, type Lang, T } from "./i18n";
+import { getUnits, setUnits as setUnitsStorage, type Units } from "./units";
 import { getRecipesLang, type Receita } from "./recipes";
 import { initImages, isImagesReady, getCachedImages } from "./image-store";
 import { upsertProfile, upsertDaily } from "./sync";
@@ -207,9 +208,14 @@ export function useDaily() {
 
 // ── Language hook ─────────────────────────────────────────────────────────────
 export function useLang() {
-  const [lang, setLangState] = useState<Lang>(getLang);
+  // Initial state must match the server's SSR default ("es") exactly, never read
+  // localStorage here — doing so makes the client's first render diverge from
+  // the server-rendered HTML and React throws a hydration error. The real
+  // stored value is applied in the effect below, which only runs after hydration.
+  const [lang, setLangState] = useState<Lang>("es");
 
   useEffect(() => {
+    setLangState(getLang());
     const sync = () => setLangState(getLang());
     window.addEventListener("mab:lang", sync);
     return () => window.removeEventListener("mab:lang", sync);
@@ -223,6 +229,27 @@ export function useLang() {
   const t = (key: keyof typeof T.es): string => T[lang][key] as string;
 
   return { lang, setLang, t };
+}
+
+// ── Units hook ─────────────────────────────────────────────────────────────
+export function useUnits() {
+  // Same hydration-safety rule as useLang above: initial state must match the
+  // server's SSR default ("metric"), the real value is synced post-hydration.
+  const [units, setUnitsState] = useState<Units>("metric");
+
+  useEffect(() => {
+    setUnitsState(getUnits());
+    const sync = () => setUnitsState(getUnits());
+    window.addEventListener("mab:units", sync);
+    return () => window.removeEventListener("mab:units", sync);
+  }, []);
+
+  const setUnits = (u: Units) => {
+    setUnitsStorage(u);
+    setUnitsState(u);
+  };
+
+  return { units, setUnits };
 }
 
 /** Resolve a set of image ids → URL, falling back to bundled stock assets.

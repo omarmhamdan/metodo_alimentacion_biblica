@@ -6,7 +6,9 @@ import sopa from "@/assets/recipe-sopa.jpg";
 import figos from "@/assets/recipe-figos.jpg";
 import suco from "@/assets/suco-sagrado.jpg";
 import type { Lang } from "./i18n";
+import type { Units } from "./units";
 import { recipeTranslationsES } from "./recipes-es";
+import { recipeUnitsUS_PT, recipeUnitsUS_ES } from "./recipes-units-us";
 import { loadOverrides } from "./admin-store";
 import { getCachedImages } from "./image-store";
 
@@ -3694,7 +3696,7 @@ export function translateVersiculo(ref: string, lang: Lang): string {
 }
 
 /** Returns the recipe merged with its Spanish translation and admin overrides */
-export function getRecipeLang(id: string, lang: Lang): Receita | undefined {
+export function getRecipeLang(id: string, lang: Lang, units: Units = "metric"): Receita | undefined {
   const base = recipes.find((r) => r.id === id);
   if (!base) return undefined;
 
@@ -3730,6 +3732,11 @@ export function getRecipeLang(id: string, lang: Lang): Receita | undefined {
   } else {
     // Admin PT title override
     if (ov.titulo && ov.titulo.trim() !== "") result = { ...result, titulo: ov.titulo };
+  }
+
+  if (units === "us") {
+    const us = lang === "es" ? recipeUnitsUS_ES[id] : recipeUnitsUS_PT[id];
+    if (us) result = { ...result, ingredientes: us.ingredientes, preparo: us.preparo };
   }
 
   return result;

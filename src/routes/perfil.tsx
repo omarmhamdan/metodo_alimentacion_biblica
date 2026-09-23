@@ -16,7 +16,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence, type PanInfo } from "framer-motion";
 import { AppShell } from "@/components/AppShell";
 import { EdI18n } from "@/components/Editable";
-import { useDaily, useUser, useLang, useRecipes } from "@/lib/store";
+import { useDaily, useUser, useLang, useUnits, useRecipes } from "@/lib/store";
 import { categoriaES } from "@/lib/recipes";
 import { RecipePhoto } from "@/components/RecipePhoto";
 
@@ -34,6 +34,7 @@ function PerfilPage() {
   const { daily, toggleFavorito } = useDaily();
   const navigate = useNavigate();
   const { t, lang, setLang } = useLang();
+  const { units, setUnits } = useUnits();
   const allRecipes = useRecipes();
   const nome = user?.nome ?? (lang === "es" ? "Visitante" : "Visitante");
   const favRecipes = allRecipes.filter((r) => (daily.favoritos ?? []).includes(r.id));
@@ -232,6 +233,26 @@ function PerfilPage() {
                       label={t("pref_lang_pt")}
                       active={lang === "pt"}
                       onClick={() => setLang("pt")}
+                    />
+                  </div>
+
+                  <p className="mb-3 mt-6 text-xs uppercase tracking-widest text-muted-foreground">
+                    {t("pref_units")}
+                  </p>
+                  <div className="grid grid-cols-1 gap-3">
+                    <LangBtn
+                      flag="📏"
+                      code="metric"
+                      label={t("pref_units_metric")}
+                      active={units === "metric"}
+                      onClick={() => setUnits("metric")}
+                    />
+                    <LangBtn
+                      flag="🇺🇸"
+                      code="us"
+                      label={t("pref_units_us")}
+                      active={units === "us"}
+                      onClick={() => setUnits("us")}
                     />
                   </div>
                   <button

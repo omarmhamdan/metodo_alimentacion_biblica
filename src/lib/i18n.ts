@@ -161,6 +161,9 @@ export const T = {
     pref_lang: "Idioma",
     pref_lang_es: "Español",
     pref_lang_pt: "Português",
+    pref_units: "Unidades de medida",
+    pref_units_metric: "Métrico (g, ml, °C)",
+    pref_units_us: "EE. UU. (oz, tazas, °F)",
     pref_close: "Cerrar",
 
     // Notifications modal
@@ -329,6 +332,9 @@ export const T = {
     pref_lang: "Idioma",
     pref_lang_es: "Español",
     pref_lang_pt: "Português",
+    pref_units: "Unidades de medida",
+    pref_units_metric: "Métrico (g, ml, °C)",
+    pref_units_us: "EUA (oz, xícaras, °F)",
     pref_close: "Fechar",
 
     notif_title: "Notificações",

@@ -5,7 +5,7 @@ import { ArrowLeft, Heart, Clock, ChefHat, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { EditImage, EdI18n } from "@/components/Editable";
 import { getRecipeLang, categoriaES, dificuldadeES } from "@/lib/recipes";
-import { useDaily, useLang } from "@/lib/store";
+import { useDaily, useLang, useUnits } from "@/lib/store";
 
 import { getRecipe as _getRecipe } from "@/lib/recipes";
 
@@ -41,8 +41,9 @@ function ReceitaDetalhe() {
   const navigate = useNavigate();
   const { daily, toggleFavorito, update } = useDaily();
   const { t, lang } = useLang();
-  // Apply language translation at render time
-  const r = getRecipeLang(base.id, lang) ?? base;
+  const { units } = useUnits();
+  // Apply language translation and unit system at render time
+  const r = getRecipeLang(base.id, lang, units) ?? base;
   const catLabel = lang === "es" ? categoriaES[base.categoria] : base.categoria;
   const difLabel = lang === "es" ? dificuldadeES[base.dificuldade] : base.dificuldade;
   const isFav = daily.favoritos.includes(r.id);
